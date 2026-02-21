@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Private Business Finance OS</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Private Business Finance OS</h1>
+      <p>Import statements, review tags, apply partner splits.</p>
+    </header>
+
+    <main class="layout">
+      <section class="card controls">
+        <h2>Statement Import</h2>
+        <p class="hint">
+          Upload CSV with columns: <code>date</code>, <code>description</code>, <code>amount</code>
+          (optional: <code>account</code>, <code>category</code>).
+        </p>
+        <input id="fileInput" type="file" accept=".csv" />
+        <div class="button-row">
+          <button id="importBtn">Import CSV</button>
+          <button id="downloadTemplateBtn">Download Template</button>
+          <button id="clearBtn" class="danger">Clear All Data</button>
+        </div>
+        <div class="api-sync">
+          <label>
+            API URL (Render)
+            <input id="apiUrlInput" type="url" placeholder="https://your-render-api.onrender.com" />
+          </label>
+          <div class="button-row">
+            <button id="syncBtn">Sync To API</button>
+            <button id="pullBtn">Pull From API</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card metrics">
+        <h2>Dashboard</h2>
+        <div class="metric-grid">
+          <article><span id="metricTotal">$0.00</span><small>Total Spend</small></article>
+          <article><span id="metricCount">0</span><small>Transactions</small></article>
+          <article><span id="metricNeedsReview">0</span><small>Needs Review</small></article>
+          <article><span id="metricRecurring">0</span><small>Recurring Candidates</small></article>
+        </div>
+      </section>
+
+      <section class="card transactions-panel">
+        <h2>Transactions</h2>
+        <div class="filters">
+          <label>
+            Search
+            <input id="searchInput" type="text" placeholder="merchant, category..." />
+          </label>
+          <label>
+            Review
+            <select id="reviewFilter">
+              <option value="all">All</option>
+              <option value="needs-review">Needs Review</option>
+              <option value="clean">Clean</option>
+            </select>
+          </label>
+          <label>
+            From
+            <input id="dateFromInput" type="date" />
+          </label>
+          <label>
+            To
+            <input id="dateToInput" type="date" />
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table id="transactionsTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Partner %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Recurring Candidates</h2>
+        <p class="hint">Detected from repeated merchant + near-monthly cadence.</p>
+        <ul id="recurringList" class="list"></ul>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

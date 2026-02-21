@@ -1,0 +1,220 @@
+:root {
+  --bg: #f4f7f5;
+  --card: #ffffff;
+  --ink: #112d24;
+  --muted: #5a6f66;
+  --accent: #1d8f6a;
+  --accent-soft: #d5f2e8;
+  --warn: #b54708;
+  --danger: #b42318;
+  --line: #d7e2dc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top right, #e8f8f1, var(--bg));
+}
+
+.app-header {
+  padding: 20px 24px 12px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.app-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  gap: 14px;
+  padding: 12px 24px 24px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 4px 12px rgba(17, 45, 36, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+
+.controls,
+.metrics {
+  grid-column: 1 / -1;
+}
+
+.transactions-panel {
+  grid-column: 1 / -1;
+}
+
+.table-wrap {
+  grid-column: 1 / -1;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.api-sync {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.api-sync label {
+  display: grid;
+  gap: 4px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+button.danger {
+  background: #fff;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.metric-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.metric-grid article {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: linear-gradient(180deg, #fff, #f8fbfa);
+}
+
+.metric-grid span {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.metric-grid small {
+  color: var(--muted);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filters label {
+  display: grid;
+  gap: 4px;
+}
+
+.filters input,
+.filters select,
+#fileInput {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px;
+  background: #fff;
+  min-width: 190px;
+}
+
+.table-wrap {
+  overflow: auto;
+  max-height: 420px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+td.description-cell {
+  min-width: 360px;
+  white-space: normal;
+}
+
+td input,
+td select {
+  min-width: 140px;
+}
+
+.status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  border: 1px solid;
+}
+
+.status.needs-review {
+  background: #fff7ed;
+  border-color: #fed7aa;
+  color: var(--warn);
+}
+
+.status.clean {
+  background: var(--accent-soft);
+  border-color: #8cd8be;
+  color: #0b684d;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.list li {
+  margin: 4px 0;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    padding: 10px;
+  }
+}
