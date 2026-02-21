@@ -3,6 +3,7 @@ const SYNC_API_URL_KEY = "client_onboarding_ops_api_url_v1";
 const SYNC_WORKSPACE_KEY = "client_onboarding_ops_workspace_key_v1";
 const SYNC_AUTO_KEY = "client_onboarding_ops_auto_sync_v1";
 const SYNC_PULL_INTERVAL_MS = 15000;
+const SYNC_REQUEST_TIMEOUT_MS = 20000;
 
 const ONBOARDING_STAGES = [
   { id: "new-client", label: "New Client" },
@@ -1127,7 +1128,11 @@ async function pullSharedData({ silent = false } = {}) {
   renderSyncStatus();
 
   try {
-    const res = await fetch(`${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/records`);
+    const res = await fetchWithTimeout(
+      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/records`,
+      {},
+      SYNC_REQUEST_TIMEOUT_MS
+    );
     if (!res.ok) {
       const body = await res.text();
       throw new Error(body || `Pull failed (${res.status})`);
@@ -1142,7 +1147,7 @@ async function pullSharedData({ silent = false } = {}) {
     state.sync.lastSyncedAt = isoNow();
     setSyncStatus(`Pulled ${records.length} shared record(s).`, "ok");
   } catch (error) {
-    setSyncStatus(`Pull failed: ${String(error.message || error)}`, "error");
+    setSyncStatus(`Pull failed: ${syncErrorMessage(error)}`, "error");
   } finally {
     state.sync.pending = false;
     renderSyncStatus();
@@ -1176,11 +1181,15 @@ async function pushSharedData({ silent = false } = {}) {
       }))
     };
 
-    const res = await fetch(`${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/sync`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await fetchWithTimeout(
+      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/sync`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      },
+      SYNC_REQUEST_TIMEOUT_MS
+    );
 
     if (!res.ok) {
       const body = await res.text();
@@ -1197,7 +1206,7 @@ async function pushSharedData({ silent = false } = {}) {
       "ok"
     );
   } catch (error) {
-    setSyncStatus(`Push failed: ${String(error.message || error)}`, "error");
+    setSyncStatus(`Push failed: ${syncErrorMessage(error)}`, "error");
   } finally {
     state.sync.pending = false;
     renderSyncStatus();
@@ -1468,7 +1477,10 @@ function isSyncReady() {
 }
 
 function normalizeApiUrl(value) {
-  return String(value || "").trim().replace(/\/+$/, "");
+  return String(value || "")
+    .trim()
+    .replace(/[?#]+$/g, "")
+    .replace(/\/+$/, "");
 }
 
 function normalizeWorkspaceKey(value) {
@@ -1524,6 +1536,24 @@ function setSyncStatus(message, type = "neutral") {
   state.sync.statusMessage = message;
   state.sync.statusType = type;
   renderSyncStatus();
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = SYNC_REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function syncErrorMessage(error) {
+  if (error && error.name === "AbortError") {
+    return `Request timed out after ${Math.round(SYNC_REQUEST_TIMEOUT_MS / 1000)}s`;
+  }
+  return String(error?.message || error || "Unknown error");
 }
 
 function idleDays(client) {
