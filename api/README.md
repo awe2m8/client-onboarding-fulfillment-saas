@@ -1,11 +1,13 @@
-# Private Business Finance API
+# Client Onboarding Ops API
 
-Minimal Express API for Render + Supabase.
+Express API for Render + Supabase.
 
 ## Endpoints
 - `GET /health`
-- `GET /transactions`
-- `POST /transactions/bulk`
+- `GET /transactions` (legacy)
+- `POST /transactions/bulk` (legacy)
+- `GET /ops/workspaces/:workspaceKey/records`
+- `POST /ops/workspaces/:workspaceKey/sync`
 
 ## Local run
 ```bash

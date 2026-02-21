@@ -1,56 +1,79 @@
-# Private Business Finance OS
+# Client Onboarding Ops (MVP)
 
-MVP stack now aligned to:
-- Frontend: Vercel
-- API: Render
-- Database: Supabase (Postgres)
+A lightweight internal SaaS workspace to track clients from onboarding through delivery fulfillment.
 
-## Live Frontend
-- https://private-business-finance-os.vercel.app
+## What this app does
+- Add client records directly in-app
+- Track onboarding and fulfillment with Kanban boards
+- Drag and drop clients across stages
+- Track onboarding form status and payment status manually
+- Manage per-client tasks and notes
+- Keep an activity timeline for each client
+- Filter by owner, product, payment/form status, pipeline, and idle age
+- Export/import all workspace data as JSON
+- Optional team sync through the API + shared workspace key
 
-## Current App (frontend)
-- CSV import for transactions
-- Auto-category tagging (keyword rules)
-- Partner split percentage editing per transaction
-- Needs-review status queue
-- Basic recurring charge detection
-- Local persistence in browser storage
+## Stripe decision for MVP
+Stripe is intentionally **not integrated** in this version.
+
+Use manual payment status updates in the app:
+- `Not Sent`
+- `Sent`
+- `Paid`
+- `Issue`
+
+## Run frontend locally
+```bash
+python3 -m http.server 8081
+```
+Then open:
+- http://localhost:8081
+
+## Team sync setup (for shared data)
+If you want both partners to use the same live dataset:
+
+1. Deploy the API (`/api`) to Render.
+2. Run `/supabase/schema.sql` in Supabase SQL Editor.
+3. Set Render env vars:
+- `DATABASE_URL` = Supabase Postgres connection string
+- `CORS_ORIGIN` = your frontend URL(s), comma-separated if needed
+4. In the app UI, set:
+- `API URL` to your Render API URL
+- `Workspace Key` to a shared key like `acme-onboarding`
+5. Click `Save Connection`, then `Pull Shared Data`.
+6. Keep `Auto sync` on for near-real-time collaboration.
 
 ## Files
-- `/index.html`, `/styles.css`, `/app.js`: deployed frontend UI
-- `/api/*`: Render-ready Node API
-- `/supabase/schema.sql`: DB schema bootstrap
-- `/render.yaml`: Render Blueprint
+- `/index.html`: main UI layout
+- `/styles.css`: styling and responsive layout
+- `/app.js`: app logic (state, kanban, tasks, notes, local storage, team sync)
+- `/api/*`: Render-ready API
+- `/supabase/schema.sql`: DB bootstrap
+- `/render.yaml`: optional Render blueprint
 
-## Deploy Flow
-1. Supabase
-- Create a Supabase project.
-- Run `/supabase/schema.sql` in SQL Editor.
-- Copy your Postgres connection string into `DATABASE_URL`.
+## Data storage modes
+- Local-only mode: browser `localStorage`
+- Shared mode: API + Postgres table `ops_client_records`
 
-2. Render
-- Create Blueprint from this repo using `/render.yaml`, or create a web service from `/api`.
-- Set env vars:
-  - `DATABASE_URL` = Supabase Postgres URL
-  - `CORS_ORIGIN` = `https://private-business-finance-os.vercel.app`
+## Default pipelines
+### Onboarding
+- New Client
+- Form Sent
+- Form Completed
+- Payment Sent
+- Paid
+- Kickoff Scheduled
+- Ready for Delivery
 
-3. Vercel
-- Frontend already deployed at:
-  - https://private-business-finance-os.vercel.app
+### Fulfillment
+- In Progress
+- Waiting on Client
+- Internal Review
+- Revision
+- Completed
 
-## Local frontend run
-```bash
-python3 -m http.server 8080
-```
-Open http://localhost:8080
-
-## CSV format
-Required columns:
-- `date`
-- `description`
-- `amount`
-
-Optional columns:
-- `account`
-- `category`
-- `partner_split_pct`
+## Notes
+- Moving to fulfillment requires:
+  - Onboarding form = `Completed`
+  - Payment status = `Paid`
+- The `Clear All Data` button only clears the current browser copy.
