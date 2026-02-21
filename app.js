@@ -61,6 +61,7 @@ const state = {
     workspaceKey: "",
     autoSync: true,
     pending: false,
+    pendingGuardTimerId: null,
     lastSyncedAt: null,
     statusMessage: "",
     statusType: "neutral",
@@ -105,7 +106,7 @@ function init() {
   state.clients = snapshot.clients;
   state.deletedRecords = snapshot.deletedRecords;
 
-  state.sync.apiUrl = localStorage.getItem(SYNC_API_URL_KEY) || "";
+  state.sync.apiUrl = normalizeApiUrl(localStorage.getItem(SYNC_API_URL_KEY) || "");
   state.sync.workspaceKey = localStorage.getItem(SYNC_WORKSPACE_KEY) || "";
   state.sync.autoSync = localStorage.getItem(SYNC_AUTO_KEY) !== "0";
 
@@ -1124,8 +1125,7 @@ async function pullSharedData({ silent = false } = {}) {
     return;
   }
 
-  state.sync.pending = true;
-  renderSyncStatus();
+  beginSyncPending();
 
   try {
     const res = await fetchWithTimeout(
@@ -1149,8 +1149,7 @@ async function pullSharedData({ silent = false } = {}) {
   } catch (error) {
     setSyncStatus(`Pull failed: ${syncErrorMessage(error)}`, "error");
   } finally {
-    state.sync.pending = false;
-    renderSyncStatus();
+    endSyncPending();
   }
 }
 
@@ -1165,8 +1164,7 @@ async function pushSharedData({ silent = false } = {}) {
     return;
   }
 
-  state.sync.pending = true;
-  renderSyncStatus();
+  beginSyncPending();
 
   try {
     const payload = {
@@ -1208,8 +1206,7 @@ async function pushSharedData({ silent = false } = {}) {
   } catch (error) {
     setSyncStatus(`Push failed: ${syncErrorMessage(error)}`, "error");
   } finally {
-    state.sync.pending = false;
-    renderSyncStatus();
+    endSyncPending();
   }
 }
 
@@ -1535,6 +1532,36 @@ function syncStatusLabel() {
 function setSyncStatus(message, type = "neutral") {
   state.sync.statusMessage = message;
   state.sync.statusType = type;
+  renderSyncStatus();
+}
+
+function beginSyncPending() {
+  state.sync.pending = true;
+
+  if (state.sync.pendingGuardTimerId) {
+    clearTimeout(state.sync.pendingGuardTimerId);
+  }
+
+  state.sync.pendingGuardTimerId = setTimeout(() => {
+    if (!state.sync.pending) {
+      return;
+    }
+    state.sync.pending = false;
+    state.sync.pendingGuardTimerId = null;
+    setSyncStatus("Sync timed out in browser. Please retry.", "error");
+  }, SYNC_REQUEST_TIMEOUT_MS + 5000);
+
+  renderSyncStatus();
+}
+
+function endSyncPending() {
+  state.sync.pending = false;
+
+  if (state.sync.pendingGuardTimerId) {
+    clearTimeout(state.sync.pendingGuardTimerId);
+    state.sync.pendingGuardTimerId = null;
+  }
+
   renderSyncStatus();
 }
 
