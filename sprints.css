@@ -546,6 +546,11 @@ button.sp-danger {
   gap: 10px;
 }
 
+.sp-detail-form {
+  display: grid;
+  gap: 10px;
+}
+
 .sp-span-2 {
   grid-column: span 2;
 }
@@ -779,27 +784,33 @@ select.sp-goal-status.sp-status-done {
   align-items: center;
 }
 
+.sp-collapsible,
 .sp-activity-details {
   border: 1px solid #e5ebe4;
-  border-radius: 10px;
-  background: #fafcfb;
+  border-radius: 12px;
+  background: #fcfdfb;
 }
 
+.sp-collapsible summary,
 .sp-activity-details summary {
   cursor: pointer;
-  padding: 8px 10px;
+  padding: 10px 12px;
   font-size: 0.9rem;
   font-weight: 700;
   color: #2a4f41;
   user-select: none;
 }
 
+.sp-collapsible[open] summary,
 .sp-activity-details[open] summary {
   border-bottom: 1px solid #e5ebe4;
 }
 
+.sp-collapsible-content,
 .sp-activity-content {
-  padding: 10px;
+  padding: 12px;
+  display: grid;
+  gap: 12px;
 }
 
 .sp-empty-state {

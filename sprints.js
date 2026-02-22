@@ -1054,89 +1054,95 @@ function renderDetail() {
 
   els.sprintDetail.innerHTML = `
     <div class="sp-detail-wrap">
-      <form id="detailSprintForm" class="sp-detail-section">
-        <h3>Sprint Profile</h3>
-        <div class="sp-detail-grid">
-          <label>
-            Sprint Name
-            <input name="name" required value="${escapeHtml(sprint.name)}" />
-          </label>
-          <label>
-            Stage
-            <select name="stageId">
-              ${optionMarkup(SPRINT_STAGES.map((stage) => ({ value: stage.id, label: stage.label })), sprint.stageId)}
-            </select>
-          </label>
-          <label>
-            Start Date
-            <input name="startDate" type="date" value="${escapeHtml(sprint.startDate || "")}" required />
-          </label>
-          <label>
-            End Date
-            <input name="endDate" type="date" value="${escapeHtml(sprint.endDate || "")}" required />
-          </label>
-          <label class="sp-span-2">
-            Overall Objectives
-            <textarea name="overallGoals">${escapeHtml(sprint.overallGoals || "")}</textarea>
-          </label>
-          <label class="sp-span-2">
-            Retro: Wins
-            <textarea name="retroWins" placeholder="What worked well this sprint?">${escapeHtml(sprint.retro.wins || "")}</textarea>
-          </label>
-          <label class="sp-span-2">
-            Retro: Improvements
-            <textarea name="retroImprovements" placeholder="What should improve next sprint?">${escapeHtml(
-              sprint.retro.improvements || ""
-            )}</textarea>
-          </label>
-          <label class="sp-span-2">
-            Retro: Next Actions
-            <textarea name="retroNextActions" placeholder="What actions roll into the next block?">${escapeHtml(
-              sprint.retro.nextActions || ""
-            )}</textarea>
-          </label>
-        </div>
-        <div class="sp-form-actions">
-          <button type="submit">Save Sprint</button>
-          <button type="button" class="sp-danger" data-action="delete-sprint">Delete Sprint</button>
-        </div>
-      </form>
+      <details class="sp-collapsible" open>
+        <summary>Owner Goals</summary>
+        <div class="sp-collapsible-content">
+          <form id="addGoalForm" class="sp-goal-form">
+            <label>
+              Owner
+              <select name="owner">
+                ${DEFAULT_GOAL_OWNERS.map((owner) => `<option value="${escapeHtml(owner)}">${escapeHtml(owner)}</option>`).join("")}
+              </select>
+            </label>
+            <label class="sp-span-2">
+              Sprint Goal
+              <input name="title" placeholder="Define the goal outcome for this sprint." required />
+            </label>
+            <label>
+              Status
+              <select name="status" class="sp-goal-status ${statusClass("todo")}">
+                ${optionMarkup(GOAL_STATUS_OPTIONS, "todo")}
+              </select>
+            </label>
+            <button type="submit">Add Goal</button>
+          </form>
 
-      <section class="sp-detail-section">
-        <h3>Owner Goals</h3>
-        <form id="addGoalForm" class="sp-goal-form">
-          <label>
-            Owner
-            <select name="owner">
-              ${DEFAULT_GOAL_OWNERS.map((owner) => `<option value="${escapeHtml(owner)}">${escapeHtml(owner)}</option>`).join("")}
-            </select>
-          </label>
-          <label class="sp-span-2">
-            Sprint Goal
-            <input name="title" placeholder="Define the goal outcome for this sprint." required />
-          </label>
-          <label>
-            Status
-            <select name="status" class="sp-goal-status ${statusClass("todo")}">
-              ${optionMarkup(GOAL_STATUS_OPTIONS, "todo")}
-            </select>
-          </label>
-          <button type="submit">Add Goal</button>
-        </form>
-
-        <div class="sp-goal-columns">
-          ${goalColumns}
-        </div>
-      </section>
-
-      <section class="sp-detail-section">
-        <details class="sp-activity-details">
-          <summary>Sprint Activity</summary>
-          <div class="sp-activity-content">
-            ${activityMarkup}
+          <div class="sp-goal-columns">
+            ${goalColumns}
           </div>
-        </details>
-      </section>
+        </div>
+      </details>
+
+      <details class="sp-collapsible" open>
+        <summary>Sprint Detail</summary>
+        <div class="sp-collapsible-content">
+          <form id="detailSprintForm" class="sp-detail-form">
+            <div class="sp-detail-grid">
+              <label>
+                Sprint Name
+                <input name="name" required value="${escapeHtml(sprint.name)}" />
+              </label>
+              <label>
+                Stage
+                <select name="stageId">
+                  ${optionMarkup(SPRINT_STAGES.map((stage) => ({ value: stage.id, label: stage.label })), sprint.stageId)}
+                </select>
+              </label>
+              <label>
+                Start Date
+                <input name="startDate" type="date" value="${escapeHtml(sprint.startDate || "")}" required />
+              </label>
+              <label>
+                End Date
+                <input name="endDate" type="date" value="${escapeHtml(sprint.endDate || "")}" required />
+              </label>
+              <label class="sp-span-2">
+                Overall Objectives
+                <textarea name="overallGoals">${escapeHtml(sprint.overallGoals || "")}</textarea>
+              </label>
+              <label class="sp-span-2">
+                Retro: Wins
+                <textarea name="retroWins" placeholder="What worked well this sprint?">${escapeHtml(
+                  sprint.retro.wins || ""
+                )}</textarea>
+              </label>
+              <label class="sp-span-2">
+                Retro: Improvements
+                <textarea name="retroImprovements" placeholder="What should improve next sprint?">${escapeHtml(
+                  sprint.retro.improvements || ""
+                )}</textarea>
+              </label>
+              <label class="sp-span-2">
+                Retro: Next Actions
+                <textarea name="retroNextActions" placeholder="What actions roll into the next block?">${escapeHtml(
+                  sprint.retro.nextActions || ""
+                )}</textarea>
+              </label>
+            </div>
+            <div class="sp-form-actions">
+              <button type="submit">Save Sprint</button>
+              <button type="button" class="sp-danger" data-action="delete-sprint">Delete Sprint</button>
+            </div>
+          </form>
+        </div>
+      </details>
+
+      <details class="sp-collapsible">
+        <summary>Sprint Activity</summary>
+        <div class="sp-collapsible-content">
+          ${activityMarkup}
+        </div>
+      </details>
     </div>
   `;
 }
