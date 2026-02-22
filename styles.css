@@ -673,6 +673,27 @@ button.danger {
   background: #e9f7ef;
 }
 
+.task-item {
+  cursor: grab;
+}
+
+.task-item:active {
+  cursor: grabbing;
+}
+
+.task-item.is-dragging {
+  opacity: 0.55;
+}
+
+.task-item.drop-before {
+  border-top: 3px solid #0b7a63;
+}
+
+.task-list.drop-at-end {
+  box-shadow: inset 0 -3px 0 rgba(11, 122, 99, 0.78);
+  border-radius: 8px;
+}
+
 .task-status-select.task-status-todo {
   border-color: #efbcbc;
   background: #fbecec;

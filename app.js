@@ -78,6 +78,7 @@ const state = {
     idle: "all"
   },
   dragClientId: null,
+  dragTaskId: null,
   sync: {
     apiUrl: "",
     workspaceKey: "",
@@ -229,6 +230,10 @@ function bindEvents() {
   els.clientDetail.addEventListener("submit", handleDetailSubmit);
   els.clientDetail.addEventListener("change", handleDetailChange);
   els.clientDetail.addEventListener("click", handleDetailClick);
+  els.clientDetail.addEventListener("dragstart", handleTaskDragStart);
+  els.clientDetail.addEventListener("dragover", handleTaskDragOver);
+  els.clientDetail.addEventListener("drop", handleTaskDrop);
+  els.clientDetail.addEventListener("dragend", handleTaskDragEnd);
 }
 
 function togglePanelSection(toggleBtn, contentEl) {
@@ -829,6 +834,156 @@ function handleDetailClick(event) {
   }
 }
 
+function handleTaskDragStart(event) {
+  const taskItem = event.target.closest(".task-item");
+  if (!taskItem) {
+    return;
+  }
+
+  const taskId = String(taskItem.dataset.taskId || "").trim();
+  if (!taskId) {
+    return;
+  }
+
+  const client = getSelectedClient();
+  if (!client || !client.tasks.some((task) => task.id === taskId)) {
+    state.dragTaskId = null;
+    return;
+  }
+
+  state.dragTaskId = taskId;
+  taskItem.classList.add("is-dragging");
+
+  if (event.dataTransfer) {
+    event.dataTransfer.setData("text/plain", taskId);
+    event.dataTransfer.effectAllowed = "move";
+  }
+}
+
+function handleTaskDragOver(event) {
+  const taskList = event.target.closest(".task-list");
+  if (!taskList || !state.dragTaskId) {
+    return;
+  }
+
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  clearTaskDropIndicators();
+
+  const beforeElement = taskItemAfterPointer(taskList, event.clientY);
+  if (beforeElement) {
+    beforeElement.classList.add("drop-before");
+  } else {
+    taskList.classList.add("drop-at-end");
+  }
+}
+
+function handleTaskDrop(event) {
+  const taskList = event.target.closest(".task-list");
+  if (!taskList || !state.dragTaskId) {
+    return;
+  }
+
+  const client = getSelectedClient();
+  if (!client || !client.tasks.some((task) => task.id === state.dragTaskId)) {
+    clearTaskDragState();
+    return;
+  }
+
+  event.preventDefault();
+
+  const beforeElement = taskItemAfterPointer(taskList, event.clientY);
+  const beforeTaskId = beforeElement ? String(beforeElement.dataset.taskId || "").trim() : "";
+  const didReorder = reorderTasks(client, state.dragTaskId, beforeTaskId);
+
+  clearTaskDragState();
+
+  if (!didReorder) {
+    return;
+  }
+
+  touchClient(client, "Reordered tasks", false);
+  persist();
+  render();
+}
+
+function handleTaskDragEnd() {
+  clearTaskDragState();
+}
+
+function clearTaskDragState() {
+  state.dragTaskId = null;
+  clearTaskDropIndicators();
+
+  document.querySelectorAll(".task-item.is-dragging").forEach((node) => {
+    node.classList.remove("is-dragging");
+  });
+}
+
+function clearTaskDropIndicators() {
+  document.querySelectorAll(".task-item.drop-before").forEach((node) => {
+    node.classList.remove("drop-before");
+  });
+
+  document.querySelectorAll(".task-list.drop-at-end").forEach((node) => {
+    node.classList.remove("drop-at-end");
+  });
+}
+
+function taskItemAfterPointer(taskList, pointerY) {
+  const candidates = Array.from(taskList.querySelectorAll(".task-item:not(.is-dragging)"));
+  let closest = {
+    offset: Number.NEGATIVE_INFINITY,
+    element: null
+  };
+
+  candidates.forEach((candidate) => {
+    const rect = candidate.getBoundingClientRect();
+    const offset = pointerY - rect.top - rect.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      closest = {
+        offset,
+        element: candidate
+      };
+    }
+  });
+
+  return closest.element;
+}
+
+function reorderTasks(client, taskId, beforeTaskId) {
+  const tasks = [...client.tasks];
+  const originalOrder = tasks.map((task) => task.id);
+  const fromIndex = tasks.findIndex((task) => task.id === taskId);
+
+  if (fromIndex < 0) {
+    return false;
+  }
+
+  const [moved] = tasks.splice(fromIndex, 1);
+  let insertIndex = tasks.length;
+
+  if (beforeTaskId) {
+    const candidateIndex = tasks.findIndex((task) => task.id === beforeTaskId);
+    insertIndex = candidateIndex >= 0 ? candidateIndex : tasks.length;
+  }
+
+  tasks.splice(insertIndex, 0, moved);
+
+  const nextOrder = tasks.map((task) => task.id);
+  if (nextOrder.join("|") === originalOrder.join("|")) {
+    return false;
+  }
+
+  moved.updatedAt = isoNow();
+  client.tasks = tasks;
+  return true;
+}
+
 function touchClient(client, message, bumpStageDate = true) {
   const now = isoNow();
   client.updatedAt = now;
@@ -984,7 +1139,7 @@ function renderDetail() {
           const titleWeightClass = status === "done" ? "is-done" : "is-active";
 
           return `
-            <li class="list-item task-item ${statusToneClass}">
+            <li class="list-item task-item ${statusToneClass}" data-task-id="${task.id}" draggable="true">
               <div class="task-row task-row-compact">
                 <p class="task-title ${titleWeightClass}">${escapeHtml(task.title)}</p>
                 <div class="task-controls">
@@ -1114,7 +1269,7 @@ function renderDetail() {
       <div class="detail-grid">
         <section class="detail-section">
           <h3>Tasks</h3>
-          <ul class="list">${tasksHtml}</ul>
+          <ul class="list task-list">${tasksHtml}</ul>
           <div class="task-intake-box">
             <h4>Add New Task</h4>
             <form id="newTaskForm" class="task-intake-grid">
