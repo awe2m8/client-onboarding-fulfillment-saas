@@ -1,4 +1,10 @@
 const PM_STORAGE_KEY = "pm_suite_projects_v1";
+const SYNC_API_URL_KEY = "client_onboarding_ops_api_url_v1";
+const SYNC_WORKSPACE_KEY = "client_onboarding_ops_workspace_key_v1";
+const PM_SYNC_AUTO_KEY = "pm_suite_auto_sync_v1";
+const PM_SYNC_PULL_INTERVAL_MS = 15000;
+const PM_SYNC_REQUEST_TIMEOUT_MS = 20000;
+const PM_APP_KEY = "project-management";
 
 const PM_STAGES = [
   { id: "backlog", label: "Backlog" },
@@ -17,6 +23,7 @@ const PM_PRIORITIES = [
 
 const state = {
   projects: [],
+  deletedRecords: [],
   selectedProjectId: null,
   dragProjectId: null,
   filters: {
@@ -24,6 +31,18 @@ const state = {
     owner: "all",
     priority: "all",
     blocked: "all"
+  },
+  sync: {
+    apiUrl: "",
+    workspaceKey: "",
+    autoSync: true,
+    pending: false,
+    pendingGuardTimerId: null,
+    pullTimerId: null,
+    pushTimeoutId: null,
+    lastSyncedAt: null,
+    statusMessage: "",
+    statusType: "neutral"
   }
 };
 
@@ -31,6 +50,13 @@ const els = {
   projectForm: document.getElementById("projectForm"),
   seedProjectsBtn: document.getElementById("seedProjectsBtn"),
   clearProjectsBtn: document.getElementById("clearProjectsBtn"),
+  apiUrlInput: document.getElementById("apiUrlInput"),
+  workspaceKeyInput: document.getElementById("workspaceKeyInput"),
+  saveSyncBtn: document.getElementById("saveSyncBtn"),
+  pullSharedBtn: document.getElementById("pullSharedBtn"),
+  pushSharedBtn: document.getElementById("pushSharedBtn"),
+  autoSyncCheckbox: document.getElementById("autoSyncCheckbox"),
+  syncStatus: document.getElementById("syncStatus"),
   searchInput: document.getElementById("searchInput"),
   ownerFilter: document.getElementById("ownerFilter"),
   priorityFilter: document.getElementById("priorityFilter"),
@@ -46,8 +72,27 @@ const els = {
 };
 
 function init() {
-  state.projects = loadProjects();
+  const snapshot = loadSnapshot();
+  state.projects = snapshot.projects;
+  state.deletedRecords = snapshot.deletedRecords;
+
+  state.sync.apiUrl = normalizeApiUrl(localStorage.getItem(SYNC_API_URL_KEY) || "");
+  state.sync.workspaceKey = localStorage.getItem(SYNC_WORKSPACE_KEY) || "";
+  state.sync.autoSync = localStorage.getItem(PM_SYNC_AUTO_KEY) !== "0";
+
+  els.apiUrlInput.value = state.sync.apiUrl;
+  els.workspaceKeyInput.value = state.sync.workspaceKey;
+  els.autoSyncCheckbox.checked = state.sync.autoSync;
+
   bindEvents();
+  restartPullTimer();
+
+  if (isSyncReady()) {
+    setSyncStatus("Team sync ready. Pull shared data to start.", "ok");
+  } else {
+    setSyncStatus("Local only. Set API URL and workspace key to share data.", "neutral");
+  }
+
   render();
 }
 
@@ -55,6 +100,15 @@ function bindEvents() {
   els.projectForm.addEventListener("submit", handleCreateProject);
   els.seedProjectsBtn.addEventListener("click", seedDemoProjects);
   els.clearProjectsBtn.addEventListener("click", clearAllProjects);
+
+  els.saveSyncBtn.addEventListener("click", saveSyncSettings);
+  els.pullSharedBtn.addEventListener("click", () => {
+    pullSharedData();
+  });
+  els.pushSharedBtn.addEventListener("click", () => {
+    pushSharedData();
+  });
+  els.autoSyncCheckbox.addEventListener("change", handleAutoSyncToggle);
 
   const filterMap = [
     [els.searchInput, "search"],
@@ -112,11 +166,12 @@ function handleCreateProject(event) {
     updatedAt: now
   };
 
+  clearDeletionRecord(project.id);
   state.projects.unshift(project);
   state.selectedProjectId = project.id;
 
   event.currentTarget.reset();
-  persistProjects();
+  persistSnapshot();
   render();
 }
 
@@ -125,10 +180,16 @@ function clearAllProjects() {
     return;
   }
 
+  const now = isoNow();
+  state.projects.forEach((project) => {
+    recordDeletion(project.id, now);
+  });
+
   state.projects = [];
   state.selectedProjectId = null;
-  persistProjects();
+  persistSnapshot();
   render();
+  setSyncStatus("Local projects cleared. Push to propagate deletes to shared workspace.", "neutral");
 }
 
 function seedDemoProjects() {
@@ -215,8 +276,51 @@ function seedDemoProjects() {
 
   state.projects = [...seeded, ...state.projects];
   state.selectedProjectId = seeded[0]?.id || state.selectedProjectId;
-  persistProjects();
+  persistSnapshot();
   render();
+}
+
+function saveSyncSettings() {
+  const apiUrl = normalizeApiUrl(els.apiUrlInput.value);
+  const workspaceKey = normalizeWorkspaceKey(els.workspaceKeyInput.value);
+
+  state.sync.apiUrl = apiUrl;
+  state.sync.workspaceKey = workspaceKey;
+
+  els.apiUrlInput.value = apiUrl;
+  els.workspaceKeyInput.value = workspaceKey;
+
+  localStorage.setItem(SYNC_API_URL_KEY, apiUrl);
+  localStorage.setItem(SYNC_WORKSPACE_KEY, workspaceKey);
+
+  restartPullTimer();
+
+  if (!isSyncReady()) {
+    setSyncStatus("Local only. Set API URL and workspace key to share data.", "neutral");
+    return;
+  }
+
+  setSyncStatus(`Saved sync settings for workspace \"${workspaceKey}\".`, "ok");
+}
+
+function handleAutoSyncToggle() {
+  state.sync.autoSync = Boolean(els.autoSyncCheckbox.checked);
+  localStorage.setItem(PM_SYNC_AUTO_KEY, state.sync.autoSync ? "1" : "0");
+
+  restartPullTimer();
+
+  if (state.sync.autoSync) {
+    setSyncStatus("Auto sync enabled. Local changes push and pulls run every 15s.", "ok");
+    scheduleAutoPush();
+    return;
+  }
+
+  if (state.sync.pushTimeoutId) {
+    clearTimeout(state.sync.pushTimeoutId);
+    state.sync.pushTimeoutId = null;
+  }
+
+  setSyncStatus("Auto sync disabled. Use Pull/Push manually.", "neutral");
 }
 
 function handleBoardClick(event) {
@@ -240,7 +344,7 @@ function handleBoardClick(event) {
   if (action === "toggle-blocked") {
     project.blocked = !project.blocked;
     touchProject(project, project.blocked ? "Marked as blocked" : "Marked as clear");
-    persistProjects();
+    persistSnapshot();
     render();
   }
 }
@@ -324,7 +428,7 @@ function clearDropHighlights() {
 function moveProject(project, nextStageId) {
   project.stageId = nextStageId;
   touchProject(project, `Moved to ${stageLabel(nextStageId)}`);
-  persistProjects();
+  persistSnapshot();
   render();
 }
 
@@ -369,7 +473,7 @@ function handleDetailSubmit(event) {
       project.activity.unshift(buildActivity(project.blocked ? "Marked as blocked" : "Marked as clear", project.updatedAt));
     }
 
-    persistProjects();
+    persistSnapshot();
     render();
     return;
   }
@@ -393,7 +497,7 @@ function handleDetailSubmit(event) {
     project.tasks.unshift(task);
     touchProject(project, `Task added: ${task.title}`);
     form.reset();
-    persistProjects();
+    persistSnapshot();
     render();
   }
 }
@@ -417,7 +521,7 @@ function handleDetailChange(event) {
   task.done = Boolean(event.target.checked);
   task.updatedAt = isoNow();
   touchProject(project, `${task.done ? "Completed" : "Reopened"} task: ${task.title}`);
-  persistProjects();
+  persistSnapshot();
   render();
 }
 
@@ -439,9 +543,10 @@ function handleDetailClick(event) {
       return;
     }
 
+    recordDeletion(project.id, isoNow());
     state.projects = state.projects.filter((item) => item.id !== project.id);
     state.selectedProjectId = state.projects[0]?.id || null;
-    persistProjects();
+    persistSnapshot();
     render();
     return;
   }
@@ -451,7 +556,7 @@ function handleDetailClick(event) {
     const task = project.tasks.find((item) => item.id === taskId);
     project.tasks = project.tasks.filter((item) => item.id !== taskId);
     touchProject(project, `Task removed: ${task ? task.title : "Task"}`);
-    persistProjects();
+    persistSnapshot();
     render();
   }
 }
@@ -475,6 +580,7 @@ function render() {
   renderMetrics();
   renderBoard();
   renderDetail();
+  renderSyncStatus();
 }
 
 function renderFilterOptions() {
@@ -685,6 +791,302 @@ function renderDetail() {
   `;
 }
 
+async function pullSharedData({ silent = false } = {}) {
+  if (!isSyncReady()) {
+    if (!silent) {
+      setSyncStatus("Set API URL and workspace key before pulling shared data.", "error");
+    }
+    return;
+  }
+
+  if (state.sync.pending) {
+    return;
+  }
+
+  beginSyncPending();
+
+  try {
+    const url = `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/records?app=${encodeURIComponent(PM_APP_KEY)}`;
+    const res = await fetchWithTimeout(url, {}, PM_SYNC_REQUEST_TIMEOUT_MS);
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(body || `Pull failed (${res.status})`);
+    }
+
+    const json = await res.json();
+    const records = Array.isArray(json.records) ? json.records : [];
+    applyRemoteRecords(records);
+    persistSnapshot(false);
+    render();
+
+    state.sync.lastSyncedAt = isoNow();
+    setSyncStatus(`Pulled ${records.length} shared project record(s).`, "ok");
+  } catch (error) {
+    setSyncStatus(`Pull failed: ${syncErrorMessage(error)}`, "error");
+  } finally {
+    endSyncPending();
+  }
+}
+
+async function pushSharedData({ silent = false } = {}) {
+  if (!isSyncReady()) {
+    if (!silent) {
+      setSyncStatus("Set API URL and workspace key before pushing shared data.", "error");
+    }
+    return;
+  }
+
+  if (state.sync.pending) {
+    return;
+  }
+
+  beginSyncPending();
+
+  try {
+    const payload = {
+      upserts: state.projects.map((project) => ({
+        id: project.id,
+        updatedAt: normalizeTimestamp(project.updatedAt),
+        payload: project
+      })),
+      deletions: state.deletedRecords.map((item) => ({
+        id: item.id,
+        updatedAt: normalizeTimestamp(item.updatedAt)
+      }))
+    };
+
+    const url = `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/sync?app=${encodeURIComponent(PM_APP_KEY)}`;
+
+    const res = await fetchWithTimeout(
+      url,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      },
+      PM_SYNC_REQUEST_TIMEOUT_MS
+    );
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(body || `Push failed (${res.status})`);
+    }
+
+    const json = await res.json();
+    state.deletedRecords = [];
+    persistSnapshot(false);
+
+    state.sync.lastSyncedAt = isoNow();
+    setSyncStatus(
+      `Pushed ${Number(json.appliedUpserts || 0)} upsert(s) and ${Number(json.appliedDeletions || 0)} deletion(s).`,
+      "ok"
+    );
+  } catch (error) {
+    setSyncStatus(`Push failed: ${syncErrorMessage(error)}`, "error");
+  } finally {
+    endSyncPending();
+  }
+}
+
+function applyRemoteRecords(records) {
+  const projectMap = new Map(state.projects.map((project) => [project.id, project]));
+  const deletedMap = new Map(state.deletedRecords.map((item) => [item.id, item.updatedAt]));
+
+  records.forEach((record) => {
+    const projectId = String(record.clientId || record.client_id || record.id || "").trim();
+    if (!projectId) {
+      return;
+    }
+
+    const recordUpdatedAt = normalizeTimestamp(record.updatedAt || record.updated_at || record.payload?.updatedAt || isoNow());
+    const localProject = projectMap.get(projectId);
+    const localProjectUpdated = localProject ? normalizeTimestamp(localProject.updatedAt || localProject.createdAt) : null;
+    const localDeletedUpdated = deletedMap.get(projectId) || null;
+    const localLatest = newerTimestamp(localProjectUpdated, localDeletedUpdated);
+
+    if (record.deleted) {
+      if (!localLatest || compareIso(recordUpdatedAt, localLatest) >= 0) {
+        projectMap.delete(projectId);
+        deletedMap.set(projectId, recordUpdatedAt);
+      }
+      return;
+    }
+
+    const sanitized = sanitizeProject({ ...record.payload, id: projectId });
+    if (!sanitized) {
+      return;
+    }
+
+    sanitized.updatedAt = newerTimestamp(normalizeTimestamp(sanitized.updatedAt), recordUpdatedAt);
+
+    if (!localLatest || compareIso(recordUpdatedAt, localLatest) >= 0) {
+      projectMap.set(projectId, sanitized);
+      deletedMap.delete(projectId);
+    }
+  });
+
+  state.projects = Array.from(projectMap.values()).sort((a, b) => compareIso(b.updatedAt, a.updatedAt));
+  state.deletedRecords = Array.from(deletedMap.entries()).map(([id, updatedAt]) => ({ id, updatedAt }));
+
+  if (state.selectedProjectId && !projectMap.has(state.selectedProjectId)) {
+    state.selectedProjectId = state.projects[0]?.id || null;
+  }
+}
+
+function recordDeletion(projectId, updatedAt) {
+  const id = String(projectId || "").trim();
+  if (!id) {
+    return;
+  }
+
+  const nextUpdatedAt = normalizeTimestamp(updatedAt || isoNow());
+  const existing = state.deletedRecords.find((item) => item.id === id);
+
+  if (!existing) {
+    state.deletedRecords.unshift({ id, updatedAt: nextUpdatedAt });
+    return;
+  }
+
+  if (compareIso(nextUpdatedAt, existing.updatedAt) > 0) {
+    existing.updatedAt = nextUpdatedAt;
+  }
+}
+
+function clearDeletionRecord(projectId) {
+  const id = String(projectId || "").trim();
+  if (!id) {
+    return;
+  }
+
+  state.deletedRecords = state.deletedRecords.filter((item) => item.id !== id);
+}
+
+function restartPullTimer() {
+  if (state.sync.pullTimerId) {
+    clearInterval(state.sync.pullTimerId);
+    state.sync.pullTimerId = null;
+  }
+
+  if (!state.sync.autoSync || !isSyncReady()) {
+    return;
+  }
+
+  state.sync.pullTimerId = setInterval(() => {
+    pullSharedData({ silent: true });
+  }, PM_SYNC_PULL_INTERVAL_MS);
+}
+
+function scheduleAutoPush() {
+  if (!state.sync.autoSync || !isSyncReady()) {
+    return;
+  }
+
+  if (state.sync.pushTimeoutId) {
+    clearTimeout(state.sync.pushTimeoutId);
+  }
+
+  state.sync.pushTimeoutId = setTimeout(() => {
+    pushSharedData({ silent: true });
+  }, 1200);
+}
+
+function isSyncReady() {
+  return Boolean(state.sync.apiUrl && state.sync.workspaceKey);
+}
+
+function renderSyncStatus() {
+  const label = syncStatusLabel();
+  const type = state.sync.statusType;
+
+  els.syncStatus.textContent = label;
+  els.syncStatus.classList.remove("error", "ok");
+
+  if (type === "error") {
+    els.syncStatus.classList.add("error");
+  }
+  if (type === "ok") {
+    els.syncStatus.classList.add("ok");
+  }
+
+  const disabled = state.sync.pending;
+  els.saveSyncBtn.disabled = disabled;
+  els.pullSharedBtn.disabled = disabled;
+  els.pushSharedBtn.disabled = disabled;
+}
+
+function syncStatusLabel() {
+  if (state.sync.pending) {
+    return "Sync in progress...";
+  }
+
+  if (state.sync.statusMessage) {
+    const suffix = state.sync.lastSyncedAt ? ` Last sync ${timeAgo(state.sync.lastSyncedAt)}.` : "";
+    return `${state.sync.statusMessage}${suffix}`;
+  }
+
+  if (!isSyncReady()) {
+    return "Local only. Set API URL and workspace key to share data.";
+  }
+
+  return "Team sync ready. Use Pull Shared Data to load latest projects.";
+}
+
+function setSyncStatus(message, type = "neutral") {
+  state.sync.statusMessage = message;
+  state.sync.statusType = type;
+  renderSyncStatus();
+}
+
+function beginSyncPending() {
+  state.sync.pending = true;
+
+  if (state.sync.pendingGuardTimerId) {
+    clearTimeout(state.sync.pendingGuardTimerId);
+  }
+
+  state.sync.pendingGuardTimerId = setTimeout(() => {
+    if (!state.sync.pending) {
+      return;
+    }
+
+    state.sync.pending = false;
+    state.sync.pendingGuardTimerId = null;
+    setSyncStatus("Sync timed out in browser. Please retry.", "error");
+  }, PM_SYNC_REQUEST_TIMEOUT_MS + 5000);
+
+  renderSyncStatus();
+}
+
+function endSyncPending() {
+  state.sync.pending = false;
+
+  if (state.sync.pendingGuardTimerId) {
+    clearTimeout(state.sync.pendingGuardTimerId);
+    state.sync.pendingGuardTimerId = null;
+  }
+
+  renderSyncStatus();
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = PM_SYNC_REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function syncErrorMessage(error) {
+  if (error && error.name === "AbortError") {
+    return `Request timed out after ${Math.round(PM_SYNC_REQUEST_TIMEOUT_MS / 1000)}s`;
+  }
+  return String(error?.message || error || "Unknown error");
+}
+
 function filteredProjects() {
   return state.projects.filter((project) => {
     const search = state.filters.search.trim().toLowerCase();
@@ -719,25 +1121,46 @@ function getSelectedProject() {
   return getProject(state.selectedProjectId);
 }
 
-function persistProjects() {
-  localStorage.setItem(PM_STORAGE_KEY, JSON.stringify(state.projects));
+function persistSnapshot(autoPush = true) {
+  localStorage.setItem(
+    PM_STORAGE_KEY,
+    JSON.stringify({
+      version: 2,
+      projects: state.projects,
+      deletedRecords: state.deletedRecords
+    })
+  );
+
+  if (autoPush) {
+    scheduleAutoPush();
+  }
 }
 
-function loadProjects() {
+function loadSnapshot() {
   try {
     const raw = localStorage.getItem(PM_STORAGE_KEY);
     if (!raw) {
-      return [];
+      return { projects: [], deletedRecords: [] };
     }
 
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) {
-      return [];
+
+    if (Array.isArray(parsed)) {
+      return {
+        projects: parsed.map(sanitizeProject).filter(Boolean),
+        deletedRecords: []
+      };
     }
 
-    return parsed.map(sanitizeProject).filter(Boolean);
+    const projectsRaw = Array.isArray(parsed?.projects) ? parsed.projects : [];
+    const deletedRaw = Array.isArray(parsed?.deletedRecords) ? parsed.deletedRecords : [];
+
+    return {
+      projects: projectsRaw.map(sanitizeProject).filter(Boolean),
+      deletedRecords: sanitizeDeletedRecords(deletedRaw)
+    };
   } catch (_error) {
-    return [];
+    return { projects: [], deletedRecords: [] };
   }
 }
 
@@ -805,6 +1228,30 @@ function sanitizeActivity(activityItems) {
     .sort((a, b) => compareIso(b.createdAt, a.createdAt));
 }
 
+function sanitizeDeletedRecords(items) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  const map = new Map();
+
+  items.forEach((item) => {
+    const id = String(item?.id || "").trim();
+    if (!id) {
+      return;
+    }
+
+    const updatedAt = normalizeTimestamp(item.updatedAt || item.deletedAt || isoNow());
+    const existing = map.get(id);
+
+    if (!existing || compareIso(updatedAt, existing) > 0) {
+      map.set(id, updatedAt);
+    }
+  });
+
+  return Array.from(map.entries()).map(([id, updatedAt]) => ({ id, updatedAt }));
+}
+
 function normalizePriority(value) {
   const v = String(value || "").trim().toLowerCase();
   return PM_PRIORITIES.some((item) => item.value === v) ? v : "medium";
@@ -834,6 +1281,22 @@ function normalizeTimestamp(value) {
     return isoNow();
   }
   return parsed.toISOString();
+}
+
+function normalizeApiUrl(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[?#]+$/g, "")
+    .replace(/\/+$/, "");
+}
+
+function normalizeWorkspaceKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-_]/g, "")
+    .slice(0, 64);
 }
 
 function stageLabel(stageId) {
@@ -870,10 +1333,28 @@ function uniqueValues(values) {
 function compareIso(a, b) {
   const aTime = new Date(a).getTime();
   const bTime = new Date(b).getTime();
-  if (Number.isNaN(aTime) || Number.isNaN(bTime)) {
-    return 0;
+
+  if (Number.isNaN(aTime) && Number.isNaN(bTime)) {
+    return String(a || "").localeCompare(String(b || ""));
   }
+  if (Number.isNaN(aTime)) {
+    return -1;
+  }
+  if (Number.isNaN(bTime)) {
+    return 1;
+  }
+
   return aTime - bTime;
+}
+
+function newerTimestamp(a, b) {
+  if (!a) {
+    return b || isoNow();
+  }
+  if (!b) {
+    return a;
+  }
+  return compareIso(a, b) >= 0 ? a : b;
 }
 
 function todayIsoDate() {

@@ -4,6 +4,7 @@ const SYNC_WORKSPACE_KEY = "client_onboarding_ops_workspace_key_v1";
 const SYNC_AUTO_KEY = "client_onboarding_ops_auto_sync_v1";
 const SYNC_PULL_INTERVAL_MS = 15000;
 const SYNC_REQUEST_TIMEOUT_MS = 20000;
+const SYNC_APP_KEY = "onboarding";
 
 const ONBOARDING_STAGES = [
   { id: "new-client", label: "New Client" },
@@ -1129,7 +1130,7 @@ async function pullSharedData({ silent = false } = {}) {
 
   try {
     const res = await fetchWithTimeout(
-      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/records`,
+      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/records?app=${encodeURIComponent(SYNC_APP_KEY)}`,
       {},
       SYNC_REQUEST_TIMEOUT_MS
     );
@@ -1180,7 +1181,7 @@ async function pushSharedData({ silent = false } = {}) {
     };
 
     const res = await fetchWithTimeout(
-      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/sync`,
+      `${state.sync.apiUrl}/ops/workspaces/${encodeURIComponent(state.sync.workspaceKey)}/sync?app=${encodeURIComponent(SYNC_APP_KEY)}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

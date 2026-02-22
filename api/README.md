@@ -6,8 +6,8 @@ Express API for Render + Supabase.
 - `GET /health`
 - `GET /transactions` (legacy)
 - `POST /transactions/bulk` (legacy)
-- `GET /ops/workspaces/:workspaceKey/records`
-- `POST /ops/workspaces/:workspaceKey/sync`
+- `GET /ops/workspaces/:workspaceKey/records?app=onboarding|project-management`
+- `POST /ops/workspaces/:workspaceKey/sync?app=onboarding|project-management`
 
 ## Local run
 ```bash
@@ -19,6 +19,8 @@ npm run dev
 
 ## Supabase setup
 Run `/supabase/schema.sql` in Supabase SQL editor.
+
+Re-run the schema when upgrading existing deployments so `ops_client_records.app_key` is added for module-isolated sync.
 
 ## Render setup
 Use the root `/render.yaml` Blueprint or create a Node Web Service from `api/`.

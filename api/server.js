@@ -106,8 +106,12 @@ app.get("/ops/workspaces/:workspaceKey/records", async (req, res) => {
   }
 
   const workspaceKey = normalizeWorkspaceKey(req.params.workspaceKey);
+  const appKey = normalizeAppKey(req.query.app || "onboarding");
   if (!workspaceKey) {
     return res.status(400).json({ error: "workspaceKey must be 2-64 chars: letters, numbers, dash, underscore" });
+  }
+  if (!appKey) {
+    return res.status(400).json({ error: "app must be 2-64 chars: letters, numbers, dash, underscore" });
   }
 
   try {
@@ -115,13 +119,15 @@ app.get("/ops/workspaces/:workspaceKey/records", async (req, res) => {
       `select client_id, payload, deleted, updated_at
        from ops_client_records
        where workspace_key = $1
+         and app_key = $2
        order by updated_at desc
        limit 10000`,
-      [workspaceKey]
+      [workspaceKey, appKey]
     );
 
     return res.json({
       workspaceKey,
+      appKey,
       records: rows.map((row) => ({
         clientId: row.client_id,
         payload: row.payload,
@@ -140,8 +146,12 @@ app.post("/ops/workspaces/:workspaceKey/sync", async (req, res) => {
   }
 
   const workspaceKey = normalizeWorkspaceKey(req.params.workspaceKey);
+  const appKey = normalizeAppKey(req.query.app || req.body?.app || "onboarding");
   if (!workspaceKey) {
     return res.status(400).json({ error: "workspaceKey must be 2-64 chars: letters, numbers, dash, underscore" });
+  }
+  if (!appKey) {
+    return res.status(400).json({ error: "app must be 2-64 chars: letters, numbers, dash, underscore" });
   }
 
   const upserts = Array.isArray(req.body?.upserts) ? req.body.upserts : [];
@@ -172,14 +182,14 @@ app.post("/ops/workspaces/:workspaceKey/sync", async (req, res) => {
       }
 
       const result = await client.query(
-        `insert into ops_client_records (workspace_key, client_id, payload, deleted, updated_at)
-         values ($1, $2, $3::jsonb, false, $4)
-         on conflict (workspace_key, client_id) do update
+        `insert into ops_client_records (workspace_key, app_key, client_id, payload, deleted, updated_at)
+         values ($1, $2, $3, $4::jsonb, false, $5)
+         on conflict (workspace_key, app_key, client_id) do update
            set payload = excluded.payload,
                deleted = false,
                updated_at = excluded.updated_at
          where ops_client_records.updated_at <= excluded.updated_at`,
-        [workspaceKey, clientId, JSON.stringify(payload), updatedAt]
+        [workspaceKey, appKey, clientId, JSON.stringify(payload), updatedAt]
       );
 
       appliedUpserts += result.rowCount;
@@ -194,14 +204,14 @@ app.post("/ops/workspaces/:workspaceKey/sync", async (req, res) => {
       }
 
       const result = await client.query(
-        `insert into ops_client_records (workspace_key, client_id, payload, deleted, updated_at)
-         values ($1, $2, '{}'::jsonb, true, $3)
-         on conflict (workspace_key, client_id) do update
+        `insert into ops_client_records (workspace_key, app_key, client_id, payload, deleted, updated_at)
+         values ($1, $2, $3, '{}'::jsonb, true, $4)
+         on conflict (workspace_key, app_key, client_id) do update
            set payload = '{}'::jsonb,
                deleted = true,
                updated_at = excluded.updated_at
          where ops_client_records.updated_at <= excluded.updated_at`,
-        [workspaceKey, clientId, updatedAt]
+        [workspaceKey, appKey, clientId, updatedAt]
       );
 
       appliedDeletions += result.rowCount;
@@ -210,6 +220,7 @@ app.post("/ops/workspaces/:workspaceKey/sync", async (req, res) => {
     await client.query("commit");
     return res.status(200).json({
       workspaceKey,
+      appKey,
       appliedUpserts,
       appliedDeletions,
       serverTime: new Date().toISOString()
@@ -223,6 +234,14 @@ app.post("/ops/workspaces/:workspaceKey/sync", async (req, res) => {
 });
 
 function normalizeWorkspaceKey(value) {
+  return normalizeSlug(value);
+}
+
+function normalizeAppKey(value) {
+  return normalizeSlug(value);
+}
+
+function normalizeSlug(value) {
   const cleaned = String(value || "")
     .trim()
     .toLowerCase()

@@ -85,6 +85,28 @@
         </div>
       </section>
 
+      <section class="pm-panel pm-sync-panel">
+        <h2>Team Sync</h2>
+        <div class="pm-sync-grid">
+          <label>
+            API URL
+            <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
+          </label>
+          <label>
+            Workspace Key
+            <input id="workspaceKeyInput" type="text" placeholder="allconvos-onboarding" />
+          </label>
+          <button id="saveSyncBtn" type="button" class="pm-ghost">Save Connection</button>
+          <button id="pullSharedBtn" type="button">Pull Shared Data</button>
+          <button id="pushSharedBtn" type="button" class="pm-ghost">Push Local Data</button>
+          <label class="pm-inline-toggle">
+            <input id="autoSyncCheckbox" type="checkbox" />
+            Auto sync (push on change + pull every 15s)
+          </label>
+        </div>
+        <p id="syncStatus" class="pm-sync-status">Local only. Set API URL and workspace key to share data.</p>
+      </section>
+
       <section class="pm-panel pm-filter-panel">
         <h2>Filters</h2>
         <div class="pm-filters">

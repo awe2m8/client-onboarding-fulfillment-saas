@@ -155,7 +155,8 @@ body {
 
 .pm-filter-panel,
 .pm-board-panel,
-.pm-detail-panel {
+.pm-detail-panel,
+.pm-sync-panel {
   grid-column: 1 / -1;
 }
 
@@ -264,6 +265,44 @@ button.pm-danger {
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.pm-sync-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  align-items: end;
+}
+
+.pm-inline-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid var(--pm-line);
+  border-radius: 10px;
+  padding: 0 10px;
+  background: #fff;
+  color: var(--pm-ink);
+}
+
+.pm-inline-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.pm-sync-status {
+  margin: 10px 0 0;
+  color: var(--pm-muted);
+  font-size: 0.88rem;
+}
+
+.pm-sync-status.error {
+  color: #8a2222;
+}
+
+.pm-sync-status.ok {
+  color: #0f6948;
 }
 
 .pm-board {

@@ -36,6 +36,7 @@ If you want both partners to use the same live dataset:
 
 1. Deploy the API (`/api`) to Render.
 2. Run `/supabase/schema.sql` in Supabase SQL Editor.
+  - If you already deployed earlier, re-run it now to apply the `app_key` migration for multi-app sync isolation.
 3. Set Render env vars:
 - `DATABASE_URL` = Supabase Postgres connection string
 - `CORS_ORIGIN` = your frontend URL(s), comma-separated if needed
@@ -44,6 +45,10 @@ If you want both partners to use the same live dataset:
 - `Workspace Key` to a shared key like `acme-onboarding`
 5. Click `Save Connection`, then `Pull Shared Data`.
 6. Keep `Auto sync` on for near-real-time collaboration.
+
+Both app modules use the same sync service with app isolation:
+- `onboarding.html` syncs with app key `onboarding`
+- `project-management.html` syncs with app key `project-management`
 
 ## Files
 - `/index.html`: launcher page with app badges
