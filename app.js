@@ -980,20 +980,29 @@ function renderDetail() {
         .map((task) => {
           const status = normalizeTaskStatus(task.status);
           const statusToneClass = taskStatusClass(status);
+          const owner = normalizeOwner(task.owner);
+          const titleWeightClass = status === "done" ? "is-done" : "is-active";
 
           return `
             <li class="list-item task-item ${statusToneClass}">
-              <div class="task-row">
-                <p><strong>${escapeHtml(task.title)}</strong></p>
-                <button class="ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
+              <div class="task-row task-row-compact">
+                <p class="task-title ${titleWeightClass}">${escapeHtml(task.title)}</p>
+                <div class="task-controls">
+                  <select
+                    class="task-status-select ${statusToneClass}"
+                    data-action="task-status"
+                    data-task-id="${task.id}"
+                    aria-label="Status for ${escapeHtml(task.title)}"
+                  >
+                    ${optionMarkup(TASK_STATUS, status)}
+                  </select>
+                  <button class="ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
+                </div>
               </div>
-              <p class="task-meta">Owner: ${escapeHtml(task.owner || "Unassigned")} • Due: ${escapeHtml(task.dueDate || "No date")}</p>
-              <label>
-                Status
-                <select class="task-status-select ${statusToneClass}" data-action="task-status" data-task-id="${task.id}">
-                  ${optionMarkup(TASK_STATUS, status)}
-                </select>
-              </label>
+              <p class="task-meta">
+                <span class="task-owner-chip">Owner: ${escapeHtml(owner)}</span>
+                <span>Due: ${escapeHtml(task.dueDate || "No date")}</span>
+              </p>
             </li>
           `;
         })
