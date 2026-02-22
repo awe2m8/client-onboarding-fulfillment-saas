@@ -79,6 +79,8 @@ const els = {
   importDataInput: document.getElementById("importDataInput"),
   intakeMetricsToggleBtn: document.getElementById("intakeMetricsToggleBtn"),
   intakeMetricsContent: document.getElementById("intakeMetricsContent"),
+  teamSyncToggleBtn: document.getElementById("teamSyncToggleBtn"),
+  teamSyncContent: document.getElementById("teamSyncContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -138,6 +140,11 @@ function bindEvents() {
   if (els.intakeMetricsToggleBtn && els.intakeMetricsContent) {
     els.intakeMetricsToggleBtn.addEventListener("click", () => {
       togglePanelSection(els.intakeMetricsToggleBtn, els.intakeMetricsContent);
+    });
+  }
+  if (els.teamSyncToggleBtn && els.teamSyncContent) {
+    els.teamSyncToggleBtn.addEventListener("click", () => {
+      togglePanelSection(els.teamSyncToggleBtn, els.teamSyncContent);
     });
   }
 
