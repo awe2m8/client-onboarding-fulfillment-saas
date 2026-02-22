@@ -30,6 +30,7 @@ Then open:
 - http://localhost:8081
 - http://localhost:8081/onboarding.html (direct onboarding app)
 - http://localhost:8081/project-management.html (project management app)
+- http://localhost:8081/sprints.html (sprint planning + retro app)
 
 ## Team sync setup (for shared data)
 If you want both partners to use the same live dataset:
@@ -49,16 +50,20 @@ If you want both partners to use the same live dataset:
 Both app modules use the same sync service with app isolation:
 - `onboarding.html` syncs with app key `onboarding`
 - `project-management.html` syncs with app key `project-management`
+- `sprints.html` syncs with app key `sprints`
 
 ## Files
 - `/index.html`: launcher page with app badges
 - `/onboarding.html`: onboarding + fulfillment app UI
 - `/project-management.html`: project management app UI
+- `/sprints.html`: two-week sprint planning + retro app UI
 - `/launcher.css`: launcher page styling
 - `/styles.css`: styling and responsive layout
 - `/app.js`: app logic (state, kanban, tasks, notes, local storage, team sync)
 - `/project-management.css`: project management styling
 - `/project-management.js`: project management logic
+- `/sprints.css`: sprint app styling
+- `/sprints.js`: sprint app logic
 - `/api/*`: Render-ready API
 - `/supabase/schema.sql`: DB bootstrap
 - `/render.yaml`: optional Render blueprint
