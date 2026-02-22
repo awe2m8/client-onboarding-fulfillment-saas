@@ -115,38 +115,61 @@
         </div>
       </section>
 
-      <section class="panel sync-panel">
+      <section class="panel board-panel">
         <div class="panel-collapse-head">
-          <h2>Team Sync API</h2>
+          <h2>Onboarding Board</h2>
           <button
-            id="teamSyncToggleBtn"
+            id="onboardingBoardToggleBtn"
             class="panel-toggle-btn"
             type="button"
-            aria-expanded="false"
-            aria-controls="teamSyncContent"
+            aria-expanded="true"
+            aria-controls="onboardingBoardContent"
           >
             <span class="panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="teamSyncContent" class="collapsible-content is-collapsed">
-          <div class="sync-grid">
-            <label>
-              API URL
-              <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
-            </label>
-            <label>
-              Workspace Key
-              <input id="workspaceKeyInput" type="text" placeholder="acme-onboarding" />
-            </label>
-            <button id="saveSyncBtn" type="button" class="ghost">Save Connection</button>
-            <button id="pullSharedBtn" type="button">Pull Shared Data</button>
-            <button id="pushSharedBtn" type="button" class="ghost">Push Local Data</button>
-            <label class="inline-toggle">
-              <input id="autoSyncCheckbox" type="checkbox" />
-              Auto sync (push on changes + pull every 15s)
-            </label>
+        <div id="onboardingBoardContent" class="collapsible-content">
+          <p class="panel-note">Drag cards across columns as clients progress.</p>
+          <div id="onboardingBoard" class="kanban-board"></div>
+        </div>
+      </section>
+
+      <section class="panel board-panel">
+        <div class="panel-collapse-head">
+          <h2>Fulfillment Board</h2>
+          <button
+            id="fulfillmentBoardToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="fulfillmentBoardContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="fulfillmentBoardContent" class="collapsible-content">
+          <p class="panel-note">Track delivery progress until completion.</p>
+          <div id="fulfillmentBoard" class="kanban-board"></div>
+        </div>
+      </section>
+
+      <section class="panel detail-panel">
+        <div class="panel-collapse-head">
+          <h2>Client Detail</h2>
+          <button
+            id="clientDetailToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="clientDetailContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="clientDetailContent" class="collapsible-content is-collapsed">
+          <div id="clientDetail" class="detail-empty">
+            Select a client card to edit profile, tasks, notes, and stage details.
           </div>
-          <p id="syncStatus" class="sync-status">Local only. Set API URL and workspace key to share data.</p>
         </div>
       </section>
 
@@ -220,61 +243,38 @@
         </div>
       </section>
 
-      <section class="panel board-panel">
+      <section class="panel sync-panel">
         <div class="panel-collapse-head">
-          <h2>Onboarding Board</h2>
+          <h2>Team Sync API</h2>
           <button
-            id="onboardingBoardToggleBtn"
+            id="teamSyncToggleBtn"
             class="panel-toggle-btn"
             type="button"
             aria-expanded="false"
-            aria-controls="onboardingBoardContent"
+            aria-controls="teamSyncContent"
           >
             <span class="panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="onboardingBoardContent" class="collapsible-content is-collapsed">
-          <p class="panel-note">Drag cards across columns as clients progress.</p>
-          <div id="onboardingBoard" class="kanban-board"></div>
-        </div>
-      </section>
-
-      <section class="panel board-panel">
-        <div class="panel-collapse-head">
-          <h2>Fulfillment Board</h2>
-          <button
-            id="fulfillmentBoardToggleBtn"
-            class="panel-toggle-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="fulfillmentBoardContent"
-          >
-            <span class="panel-toggle-icon">▾</span>
-          </button>
-        </div>
-        <div id="fulfillmentBoardContent" class="collapsible-content is-collapsed">
-          <p class="panel-note">Track delivery progress until completion.</p>
-          <div id="fulfillmentBoard" class="kanban-board"></div>
-        </div>
-      </section>
-
-      <section class="panel detail-panel">
-        <div class="panel-collapse-head">
-          <h2>Client Detail</h2>
-          <button
-            id="clientDetailToggleBtn"
-            class="panel-toggle-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="clientDetailContent"
-          >
-            <span class="panel-toggle-icon">▾</span>
-          </button>
-        </div>
-        <div id="clientDetailContent" class="collapsible-content is-collapsed">
-          <div id="clientDetail" class="detail-empty">
-            Select a client card to edit profile, tasks, notes, and stage details.
+        <div id="teamSyncContent" class="collapsible-content is-collapsed">
+          <div class="sync-grid">
+            <label>
+              API URL
+              <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
+            </label>
+            <label>
+              Workspace Key
+              <input id="workspaceKeyInput" type="text" placeholder="acme-onboarding" />
+            </label>
+            <button id="saveSyncBtn" type="button" class="ghost">Save Connection</button>
+            <button id="pullSharedBtn" type="button">Pull Shared Data</button>
+            <button id="pushSharedBtn" type="button" class="ghost">Push Local Data</button>
+            <label class="inline-toggle">
+              <input id="autoSyncCheckbox" type="checkbox" />
+              Auto sync (push on changes + pull every 15s)
+            </label>
           </div>
+          <p id="syncStatus" class="sync-status">Local only. Set API URL and workspace key to share data.</p>
         </div>
       </section>
     </main>

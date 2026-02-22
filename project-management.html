@@ -106,38 +106,42 @@
         </div>
       </section>
 
-      <section class="pm-panel pm-sync-panel">
+      <section class="pm-panel pm-board-panel">
         <div class="pm-panel-collapse-head">
-          <h2>Team Sync API</h2>
+          <h2>Project Plan</h2>
           <button
-            id="pmSyncToggleBtn"
+            id="pmBoardToggleBtn"
             class="pm-panel-toggle-btn"
             type="button"
-            aria-expanded="false"
-            aria-controls="pmSyncContent"
+            aria-expanded="true"
+            aria-controls="pmBoardContent"
           >
             <span class="pm-panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="pmSyncContent" class="pm-collapsible-content is-collapsed">
-          <div class="pm-sync-grid">
-            <label>
-              API URL
-              <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
-            </label>
-            <label>
-              Workspace Key
-              <input id="workspaceKeyInput" type="text" placeholder="allconvos-onboarding" />
-            </label>
-            <button id="saveSyncBtn" type="button" class="pm-ghost">Save Connection</button>
-            <button id="pullSharedBtn" type="button">Pull Shared Data</button>
-            <button id="pushSharedBtn" type="button" class="pm-ghost">Push Local Data</button>
-            <label class="pm-inline-toggle">
-              <input id="autoSyncCheckbox" type="checkbox" />
-              Auto sync (push on change + pull every 15s)
-            </label>
+        <div id="pmBoardContent" class="pm-collapsible-content">
+          <p class="pm-panel-note">Drag cards between stages to update project flow.</p>
+          <div id="projectBoard" class="pm-board"></div>
+        </div>
+      </section>
+
+      <section class="pm-panel pm-detail-panel">
+        <div class="pm-panel-collapse-head">
+          <h2>Project Details</h2>
+          <button
+            id="pmDetailToggleBtn"
+            class="pm-panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="pmDetailContent"
+          >
+            <span class="pm-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="pmDetailContent" class="pm-collapsible-content">
+          <div id="projectDetail" class="pm-detail-empty">
+            Select a project card to manage project details, tasks, and activity.
           </div>
-          <p id="syncStatus" class="pm-sync-status">Local only. Set API URL and workspace key to share data.</p>
         </div>
       </section>
 
@@ -188,42 +192,38 @@
         </div>
       </section>
 
-      <section class="pm-panel pm-board-panel">
+      <section class="pm-panel pm-sync-panel">
         <div class="pm-panel-collapse-head">
-          <h2>Project Plan</h2>
+          <h2>Team Sync API</h2>
           <button
-            id="pmBoardToggleBtn"
+            id="pmSyncToggleBtn"
             class="pm-panel-toggle-btn"
             type="button"
             aria-expanded="false"
-            aria-controls="pmBoardContent"
+            aria-controls="pmSyncContent"
           >
             <span class="pm-panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="pmBoardContent" class="pm-collapsible-content is-collapsed">
-          <p class="pm-panel-note">Drag cards between stages to update project flow.</p>
-          <div id="projectBoard" class="pm-board"></div>
-        </div>
-      </section>
-
-      <section class="pm-panel pm-detail-panel">
-        <div class="pm-panel-collapse-head">
-          <h2>Project Details</h2>
-          <button
-            id="pmDetailToggleBtn"
-            class="pm-panel-toggle-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="pmDetailContent"
-          >
-            <span class="pm-panel-toggle-icon">▾</span>
-          </button>
-        </div>
-        <div id="pmDetailContent" class="pm-collapsible-content is-collapsed">
-          <div id="projectDetail" class="pm-detail-empty">
-            Select a project card to manage project details, tasks, and activity.
+        <div id="pmSyncContent" class="pm-collapsible-content is-collapsed">
+          <div class="pm-sync-grid">
+            <label>
+              API URL
+              <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
+            </label>
+            <label>
+              Workspace Key
+              <input id="workspaceKeyInput" type="text" placeholder="allconvos-onboarding" />
+            </label>
+            <button id="saveSyncBtn" type="button" class="pm-ghost">Save Connection</button>
+            <button id="pullSharedBtn" type="button">Pull Shared Data</button>
+            <button id="pushSharedBtn" type="button" class="pm-ghost">Push Local Data</button>
+            <label class="pm-inline-toggle">
+              <input id="autoSyncCheckbox" type="checkbox" />
+              Auto sync (push on change + pull every 15s)
+            </label>
           </div>
+          <p id="syncStatus" class="pm-sync-status">Local only. Set API URL and workspace key to share data.</p>
         </div>
       </section>
     </main>

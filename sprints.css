@@ -570,9 +570,42 @@ button.sp-danger {
   background: #fff;
 }
 
+.sp-goal-column.sp-owner-jesse {
+  border-color: #bfd7ee;
+  background: linear-gradient(180deg, #f4f9ff, #eef6ff);
+}
+
+.sp-goal-column.sp-owner-giles {
+  border-color: #b9dfc1;
+  background: linear-gradient(180deg, #f2fbf2, #edf8ee);
+}
+
+.sp-goal-column.sp-owner-generic {
+  border-color: #e0e6df;
+  background: #fff;
+}
+
 .sp-goal-column h4 {
   margin: 0 0 8px;
   font-size: 0.9rem;
+}
+
+.sp-goal-column.sp-owner-jesse h4 {
+  color: #1f4f79;
+}
+
+.sp-goal-column.sp-owner-giles h4 {
+  color: #245f35;
+}
+
+.sp-goal-column.sp-owner-jesse .sp-list-item {
+  border-color: #d3e5f5;
+  background: #f8fbff;
+}
+
+.sp-goal-column.sp-owner-giles .sp-list-item {
+  border-color: #cee6d3;
+  background: #f7fcf7;
 }
 
 .sp-list {

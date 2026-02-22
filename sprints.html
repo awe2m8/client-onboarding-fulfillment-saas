@@ -91,6 +91,45 @@
         </div>
       </section>
 
+      <section class="sp-panel sp-board-panel">
+        <div class="sp-panel-collapse-head">
+          <h2>Sprint Board</h2>
+          <button
+            id="sprintBoardToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="sprintBoardContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="sprintBoardContent" class="sp-collapsible-content">
+          <p class="sp-panel-note">Drag sprint cards between stages as the block progresses.</p>
+          <div id="sprintBoard" class="sp-board"></div>
+        </div>
+      </section>
+
+      <section class="sp-panel sp-detail-panel">
+        <div class="sp-panel-collapse-head">
+          <h2>Sprint Detail</h2>
+          <button
+            id="sprintDetailToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="sprintDetailContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="sprintDetailContent" class="sp-collapsible-content">
+          <div id="sprintDetail" class="sp-detail-empty">
+            Select a sprint card to manage objectives, Jesse/Giles goals, and retro notes.
+          </div>
+        </div>
+      </section>
+
       <section class="sp-panel sp-sync-panel">
         <div class="sp-panel-collapse-head">
           <h2>Team Sync</h2>
@@ -123,45 +162,6 @@
             </label>
           </div>
           <p id="syncStatus" class="sp-sync-status">Local only. Set API URL and workspace key to share data.</p>
-        </div>
-      </section>
-
-      <section class="sp-panel sp-board-panel">
-        <div class="sp-panel-collapse-head">
-          <h2>Sprint Board</h2>
-          <button
-            id="sprintBoardToggleBtn"
-            class="sp-panel-toggle-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="sprintBoardContent"
-          >
-            <span class="sp-panel-toggle-icon">▾</span>
-          </button>
-        </div>
-        <div id="sprintBoardContent" class="sp-collapsible-content is-collapsed">
-          <p class="sp-panel-note">Drag sprint cards between stages as the block progresses.</p>
-          <div id="sprintBoard" class="sp-board"></div>
-        </div>
-      </section>
-
-      <section class="sp-panel sp-detail-panel">
-        <div class="sp-panel-collapse-head">
-          <h2>Sprint Detail</h2>
-          <button
-            id="sprintDetailToggleBtn"
-            class="sp-panel-toggle-btn"
-            type="button"
-            aria-expanded="false"
-            aria-controls="sprintDetailContent"
-          >
-            <span class="sp-panel-toggle-icon">▾</span>
-          </button>
-        </div>
-        <div id="sprintDetailContent" class="sp-collapsible-content is-collapsed">
-          <div id="sprintDetail" class="sp-detail-empty">
-            Select a sprint card to manage objectives, Jesse/Giles goals, and retro notes.
-          </div>
         </div>
       </section>
     </main>

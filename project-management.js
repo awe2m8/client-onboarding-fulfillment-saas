@@ -736,8 +736,12 @@ function renderDetail() {
   const taskMarkup = project.tasks.length
     ? project.tasks
         .map(
-          (task) => `
-            <li class="pm-list-item">
+          (task) => {
+            const assignee = normalizeOwner(task.assignee);
+            const ownerClass = ownerThemeClass(assignee);
+
+            return `
+            <li class="pm-list-item pm-task-item ${ownerClass}">
               <div class="pm-task-row">
                 <label class="pm-task-check">
                   <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${task.done ? "checked" : ""} />
@@ -745,11 +749,12 @@ function renderDetail() {
                 </label>
                 <button class="pm-ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
               </div>
-              <p class="pm-task-meta">Assigned to ${escapeHtml(task.assignee || "Jesse")} • ${
+              <p class="pm-task-meta"><span class="pm-task-owner-chip ${ownerClass}">${escapeHtml(assignee)}</span> • ${
                 task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"
               }</p>
             </li>
-          `
+          `;
+          }
         )
         .join("")
     : '<p class="pm-empty-state">No tasks yet.</p>';
@@ -1272,6 +1277,10 @@ function sanitizeTasks(tasks) {
 function normalizeOwner(value) {
   const owner = String(value || "").trim();
   return PM_OWNER_OPTIONS.some((option) => option.value === owner) ? owner : "Jesse";
+}
+
+function ownerThemeClass(owner) {
+  return normalizeOwner(owner) === "Giles" ? "pm-owner-giles" : "pm-owner-jesse";
 }
 
 function sanitizeActivity(activityItems) {

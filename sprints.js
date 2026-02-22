@@ -834,7 +834,7 @@ function renderDetail() {
         : '<p class="sp-empty-state">No goals yet.</p>';
 
       return `
-        <article class="sp-goal-column">
+        <article class="sp-goal-column ${ownerColumnClass(owner)}">
           <h4>${escapeHtml(owner)} Goals</h4>
           ${listMarkup}
         </article>
@@ -1739,6 +1739,17 @@ function ownerColumns(goals) {
   const existing = uniqueValues(goals.map((goal) => goal.owner));
   const extras = existing.filter((owner) => !DEFAULT_GOAL_OWNERS.includes(owner));
   return [...DEFAULT_GOAL_OWNERS, ...extras];
+}
+
+function ownerColumnClass(owner) {
+  const normalized = String(owner || "").trim().toLowerCase();
+  if (normalized === "giles") {
+    return "sp-owner-giles";
+  }
+  if (normalized === "jesse") {
+    return "sp-owner-jesse";
+  }
+  return "sp-owner-generic";
 }
 
 function optionMarkup(options, selectedValue) {
