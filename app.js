@@ -776,7 +776,7 @@ function handleDetailChange(event) {
       return;
     }
 
-    task.status = target.value;
+    task.status = normalizeTaskStatus(target.value);
     task.updatedAt = isoNow();
     touchClient(client, `Task updated: ${task.title} (${labelFor(TASK_STATUS, task.status)})`);
     persist();
@@ -977,9 +977,12 @@ function renderDetail() {
 
   const tasksHtml = client.tasks.length
     ? client.tasks
-        .map(
-          (task) => `
-            <li class="list-item">
+        .map((task) => {
+          const status = normalizeTaskStatus(task.status);
+          const statusToneClass = taskStatusClass(status);
+
+          return `
+            <li class="list-item task-item ${statusToneClass}">
               <div class="task-row">
                 <p><strong>${escapeHtml(task.title)}</strong></p>
                 <button class="ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
@@ -987,13 +990,13 @@ function renderDetail() {
               <p class="task-meta">Owner: ${escapeHtml(task.owner || "Unassigned")} • Due: ${escapeHtml(task.dueDate || "No date")}</p>
               <label>
                 Status
-                <select data-action="task-status" data-task-id="${task.id}">
-                  ${optionMarkup(TASK_STATUS, task.status)}
+                <select class="task-status-select ${statusToneClass}" data-action="task-status" data-task-id="${task.id}">
+                  ${optionMarkup(TASK_STATUS, status)}
                 </select>
               </label>
             </li>
-          `
-        )
+          `;
+        })
         .join("")
     : '<p class="empty-state">No tasks yet.</p>';
 
@@ -1225,6 +1228,15 @@ function ownerOptionsForValue(owner) {
 function normalizeOwner(value) {
   const owner = String(value || "").trim();
   return OWNER_OPTIONS.some((option) => option.value === owner) ? owner : "Jesse";
+}
+
+function normalizeTaskStatus(value) {
+  const status = String(value || "").trim().toLowerCase();
+  return TASK_STATUS.some((item) => item.value === status) ? status : "todo";
+}
+
+function taskStatusClass(value) {
+  return `task-status-${normalizeTaskStatus(value)}`;
 }
 
 function optionMarkup(options, selectedValue) {
@@ -1508,9 +1520,9 @@ function sanitizeTasks(tasks) {
     .map((task) => ({
       id: String(task.id || uid("task")),
       title: String(task.title || "").trim(),
-      owner: String(task.owner || "").trim(),
+      owner: normalizeOwner(task.owner),
       dueDate: String(task.dueDate || ""),
-      status: TASK_STATUS.some((item) => item.value === task.status) ? task.status : "todo",
+      status: normalizeTaskStatus(task.status),
       createdAt: normalizeTimestamp(task.createdAt || isoNow()),
       updatedAt: normalizeTimestamp(task.updatedAt || isoNow())
     }))

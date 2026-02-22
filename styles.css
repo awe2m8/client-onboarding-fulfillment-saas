@@ -599,6 +599,39 @@ button.danger {
   font-size: 0.8rem;
 }
 
+.task-item.task-status-todo {
+  border-color: #efbcbc;
+  background: #fbecec;
+}
+
+.task-item.task-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+}
+
+.task-item.task-status-done {
+  border-color: #9fd0b4;
+  background: #e9f7ef;
+}
+
+.task-status-select.task-status-todo {
+  border-color: #efbcbc;
+  background: #fbecec;
+  color: #8a2222;
+}
+
+.task-status-select.task-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+  color: #8f5415;
+}
+
+.task-status-select.task-status-done {
+  border-color: #9fd0b4;
+  background: #ebf7f0;
+  color: #1f6b4e;
+}
+
 .task-intake-box {
   margin-top: 10px;
   border: 1px solid var(--line);
