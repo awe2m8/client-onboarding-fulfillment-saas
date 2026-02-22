@@ -1,0 +1,144 @@
+:root {
+  --ui-font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --ui-color-bg: #f5f5ef;
+  --ui-color-surface: #ffffff;
+  --ui-color-surface-soft: #f8faf7;
+  --ui-color-text: #1f2621;
+  --ui-color-muted: #59635d;
+  --ui-color-border: #d4ddd4;
+  --ui-color-brand: #0b7a63;
+  --ui-color-brand-dark: #075746;
+  --ui-color-accent: #ef7e56;
+  --ui-color-danger: #b33a3a;
+  --ui-color-warning: #8f5415;
+  --ui-color-success: #1f6b4e;
+
+  --ui-radius-sm: 10px;
+  --ui-radius-md: 12px;
+  --ui-radius-lg: 16px;
+  --ui-shadow-md: 0 12px 28px rgba(31, 35, 28, 0.1);
+  --ui-focus-ring: 0 0 0 3px rgba(11, 122, 99, 0.24);
+  --ui-transition-fast: 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Legacy aliases used across app-specific stylesheets. */
+  --bg: var(--ui-color-bg);
+  --panel: var(--ui-color-surface);
+  --panel-2: var(--ui-color-surface-soft);
+  --ink: var(--ui-color-text);
+  --muted: var(--ui-color-muted);
+  --line: var(--ui-color-border);
+  --brand: var(--ui-color-brand);
+  --brand-dark: var(--ui-color-brand-dark);
+  --accent: var(--ui-color-accent);
+  --danger: var(--ui-color-danger);
+  --shadow: var(--ui-shadow-md);
+
+  --pm-bg: var(--ui-color-bg);
+  --pm-panel: var(--ui-color-surface);
+  --pm-panel-soft: var(--ui-color-surface-soft);
+  --pm-ink: var(--ui-color-text);
+  --pm-muted: var(--ui-color-muted);
+  --pm-line: var(--ui-color-border);
+  --pm-brand: var(--ui-color-brand);
+  --pm-brand-dark: var(--ui-color-brand-dark);
+  --pm-danger: var(--ui-color-danger);
+  --pm-shadow: var(--ui-shadow-md);
+
+  --rt-bg: var(--ui-color-bg);
+  --rt-panel: var(--ui-color-surface);
+  --rt-panel-soft: var(--ui-color-surface-soft);
+  --rt-ink: var(--ui-color-text);
+  --rt-muted: var(--ui-color-muted);
+  --rt-line: var(--ui-color-border);
+  --rt-brand: var(--ui-color-brand);
+  --rt-brand-dark: var(--ui-color-brand-dark);
+  --rt-danger: var(--ui-color-danger);
+  --rt-warning: var(--ui-color-warning);
+  --rt-success: var(--ui-color-success);
+  --rt-shadow: var(--ui-shadow-md);
+}
+
+body {
+  font-family: var(--ui-font-family);
+}
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  border-radius: var(--ui-radius-sm);
+  border: 1px solid var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: var(--panel, var(--pm-panel, var(--rt-panel, var(--ui-color-surface))));
+  color: var(--ink, var(--pm-ink, var(--rt-ink, var(--ui-color-text))));
+  min-height: 36px;
+  transition: border-color var(--ui-transition-fast), box-shadow var(--ui-transition-fast),
+    background var(--ui-transition-fast), color var(--ui-transition-fast);
+}
+
+textarea {
+  line-height: 1.45;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--brand, var(--pm-brand, var(--rt-brand, var(--ui-color-brand))));
+  box-shadow: var(--ui-focus-ring);
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-focus-ring);
+}
+
+.panel-toggle-btn,
+.pm-panel-toggle-btn,
+.sp-panel-toggle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--line, var(--pm-line, var(--ui-color-border)));
+  background: var(--panel, var(--pm-panel, var(--ui-color-surface)));
+  color: var(--ink, var(--pm-ink, var(--ui-color-text)));
+  transition: border-color var(--ui-transition-fast), color var(--ui-transition-fast),
+    box-shadow var(--ui-transition-fast), transform 120ms ease;
+}
+
+.panel-toggle-btn:hover,
+.pm-panel-toggle-btn:hover,
+.sp-panel-toggle-btn:hover {
+  border-color: var(--brand, var(--pm-brand, var(--ui-color-brand)));
+  color: var(--brand, var(--pm-brand, var(--ui-color-brand)));
+}
+
+.panel-toggle-btn:active,
+.pm-panel-toggle-btn:active,
+.sp-panel-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+.panel-toggle-icon,
+.pm-panel-toggle-icon,
+.sp-panel-toggle-icon {
+  display: inline-block;
+  transition: transform var(--ui-transition-fast);
+}
+
+.panel-toggle-btn[aria-expanded="false"] .panel-toggle-icon,
+.pm-panel-toggle-btn[aria-expanded="false"] .pm-panel-toggle-icon,
+.sp-panel-toggle-btn[aria-expanded="false"] .sp-panel-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
