@@ -65,11 +65,28 @@
                 </label>
                 <label>
                   Product
-                  <input name="product" type="text" required placeholder="Website Build" />
+                  <select name="product" required>
+                    <option value="">Select product</option>
+                    <option value="Front Desk Core $399 recurring/mo">Front Desk Core $399 recurring/mo</option>
+                    <option value="Speed to Lead Follow up $999 recurring/mo">Speed to Lead Follow up $999 recurring/mo</option>
+                    <option value="DBR One Off">DBR One Off</option>
+                    <option value="SEO One Off">SEO One Off</option>
+                    <option value="OpenClaw CUA One Off">OpenClaw CUA One Off</option>
+                    <option value="OpenClaw CUA recurring/mo">OpenClaw CUA recurring/mo</option>
+                    <option value="Website Build One Off">Website Build One Off</option>
+                  </select>
                 </label>
                 <label>
                   Owner
                   <input name="owner" type="text" required placeholder="Jesse" />
+                </label>
+                <label>
+                  Setup Fee
+                  <select name="setupFee" required>
+                    <option value="">Select setup fee</option>
+                    <option value="2000">$2000</option>
+                    <option value="1000">$1000</option>
+                  </select>
                 </label>
                 <label>
                   Contract Value (USD)

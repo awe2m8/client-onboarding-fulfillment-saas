@@ -43,6 +43,22 @@ const TASK_STATUS = [
   { value: "done", label: "Done" }
 ];
 
+const PRODUCT_OPTIONS = [
+  { value: "Front Desk Core $399 recurring/mo", label: "Front Desk Core $399 recurring/mo" },
+  { value: "Speed to Lead Follow up $999 recurring/mo", label: "Speed to Lead Follow up $999 recurring/mo" },
+  { value: "DBR One Off", label: "DBR One Off" },
+  { value: "SEO One Off", label: "SEO One Off" },
+  { value: "OpenClaw CUA One Off", label: "OpenClaw CUA One Off" },
+  { value: "OpenClaw CUA recurring/mo", label: "OpenClaw CUA recurring/mo" },
+  { value: "Website Build One Off", label: "Website Build One Off" }
+];
+
+const SETUP_FEE_OPTIONS = [
+  { value: "", label: "Select setup fee" },
+  { value: 2000, label: "$2000" },
+  { value: 1000, label: "$1000" }
+];
+
 const state = {
   clients: [],
   deletedRecords: [],
@@ -251,6 +267,7 @@ function handleCreateClient(event) {
     phone: String(formData.get("phone") || "").trim(),
     product,
     owner,
+    setupFee: safeMoney(formData.get("setupFee")),
     contractValue: safeMoney(formData.get("contractValue")),
     pipeline: "onboarding",
     stageId: "new-client",
@@ -298,8 +315,9 @@ function seedDemoData() {
       company: "Northline Studio",
       email: "maya@northline.studio",
       phone: "(555) 208-5599",
-      product: "Brand + Website Sprint",
+      product: "Front Desk Core $399 recurring/mo",
       owner: "Jesse",
+      setupFee: 2000,
       contractValue: 4200,
       pipeline: "onboarding",
       stageId: "form-sent",
@@ -312,8 +330,9 @@ function seedDemoData() {
       company: "Beacon Wellness",
       email: "jordan@beaconwellness.co",
       phone: "(555) 492-1183",
-      product: "Monthly SEO Retainer",
+      product: "Speed to Lead Follow up $999 recurring/mo",
       owner: "Ana",
+      setupFee: 1000,
       contractValue: 1800,
       pipeline: "onboarding",
       stageId: "ready-for-delivery",
@@ -326,8 +345,9 @@ function seedDemoData() {
       company: "Ridgepoint Legal",
       email: "camila@ridgepointlegal.com",
       phone: "(555) 855-9921",
-      product: "Lead Funnel Build",
+      product: "Website Build One Off",
       owner: "Jesse",
+      setupFee: 2000,
       contractValue: 3600,
       pipeline: "fulfillment",
       stageId: "waiting-on-client",
@@ -641,6 +661,7 @@ function handleDetailSubmit(event) {
     client.phone = String(formData.get("phone") || "").trim();
     client.product = String(formData.get("product") || "").trim();
     client.owner = String(formData.get("owner") || "").trim();
+    client.setupFee = safeMoney(formData.get("setupFee"));
     client.contractValue = safeMoney(formData.get("contractValue"));
     client.blockerNote = String(formData.get("blockerNote") || "").trim();
 
@@ -945,6 +966,7 @@ function renderDetail() {
     client.pipeline === "onboarding"
       ? optionMarkup(ONBOARDING_STAGES.map((s) => ({ value: s.id, label: s.label })), client.stageId)
       : optionMarkup(FULFILLMENT_STAGES.map((s) => ({ value: s.id, label: s.label })), client.stageId);
+  const productOptions = productOptionsForClient(client.product);
 
   const tasksHtml = client.tasks.length
     ? client.tasks
@@ -1019,11 +1041,19 @@ function renderDetail() {
           </label>
           <label>
             Product
-            <input name="product" required value="${escapeHtml(client.product)}" />
+            <select name="product" required>
+              ${optionMarkup(productOptions, client.product)}
+            </select>
           </label>
           <label>
             Owner
             <input name="owner" required value="${escapeHtml(client.owner)}" />
+          </label>
+          <label>
+            Setup Fee
+            <select name="setupFee" required>
+              ${optionMarkup(SETUP_FEE_OPTIONS, client.setupFee)}
+            </select>
           </label>
           <label>
             Contract Value
@@ -1149,11 +1179,26 @@ function labelFor(options, value) {
   return options.find((option) => option.value === value)?.label || value;
 }
 
+function productOptionsForClient(product) {
+  const current = String(product || "").trim();
+  const hasCurrent = PRODUCT_OPTIONS.some((option) => option.value === current);
+  const options = [{ value: "", label: "Select product" }, ...PRODUCT_OPTIONS];
+
+  if (!current || hasCurrent) {
+    return options;
+  }
+
+  return [
+    { value: current, label: `${current} (legacy)` },
+    ...options
+  ];
+}
+
 function optionMarkup(options, selectedValue) {
   return options
     .map(
       (option) =>
-        `<option value="${escapeHtml(option.value)}"${option.value === selectedValue ? " selected" : ""}>${escapeHtml(option.label)}</option>`
+        `<option value="${escapeHtml(option.value)}"${String(option.value) === String(selectedValue) ? " selected" : ""}>${escapeHtml(option.label)}</option>`
     )
     .join("");
 }
@@ -1398,6 +1443,7 @@ function sanitizeClient(input) {
     phone: String(input.phone || "").trim(),
     product: String(input.product || "").trim(),
     owner: String(input.owner || "").trim(),
+    setupFee: safeMoney(input.setupFee),
     contractValue: safeMoney(input.contractValue),
     pipeline,
     stageId: validStage,
