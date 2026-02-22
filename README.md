@@ -45,6 +45,19 @@ What it checks:
 - Button accessible naming
 - Basic form-control labeling heuristics
 
+## Playwright + axe (CI-ready)
+Install dependencies once, then run the suite:
+
+```bash
+npm install
+npx playwright install chromium
+npm run test:a11y
+```
+
+CI automation:
+- Workflow: `/.github/workflows/ui-a11y.yml`
+- Runs smoke checks + Playwright/axe on push to `main` and pull requests.
+
 ## Team sync setup (for shared data)
 If you want both partners to use the same live dataset:
 

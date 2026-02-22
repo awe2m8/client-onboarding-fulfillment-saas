@@ -1,0 +1,16 @@
+{
+  "name": "client-onboarding-fulfillment-saas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "a11y:smoke": "node scripts/a11y-smoke.mjs",
+    "test:a11y": "playwright test tests/a11y.spec.mjs",
+    "test:a11y:headed": "playwright test tests/a11y.spec.mjs --headed",
+    "test:a11y:ci": "playwright test tests/a11y.spec.mjs --reporter=line,html"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.52.0"
+  }
+}

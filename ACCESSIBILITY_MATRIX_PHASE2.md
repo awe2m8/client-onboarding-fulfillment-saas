@@ -29,6 +29,7 @@ Standard target: WCAG 2.2 AA baseline
 - Focus ring is visible for keyboard interaction on links/buttons/summary + form controls.
 - Toggle controls retain minimum 32x32 hit target.
 - Local automation available via `node scripts/a11y-smoke.mjs`.
+- CI workflow available via `/.github/workflows/ui-a11y.yml` (Playwright + axe + smoke checks).
 
 ## Outstanding Work (Phase 3 Candidate)
 

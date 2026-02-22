@@ -1,0 +1,44 @@
+name: UI A11y Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ui-a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Playwright Browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run HTML Accessibility Smoke Checks
+        run: npm run a11y:smoke
+
+      - name: Run Playwright + axe Checks
+        run: npm run test:a11y:ci
+
+      - name: Upload Playwright Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
