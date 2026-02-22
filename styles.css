@@ -154,6 +154,12 @@ h1 {
   font-size: 0.9rem;
 }
 
+.panel-note {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .panel-collapse-head {
   display: flex;
   align-items: center;

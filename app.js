@@ -81,6 +81,14 @@ const els = {
   intakeMetricsContent: document.getElementById("intakeMetricsContent"),
   teamSyncToggleBtn: document.getElementById("teamSyncToggleBtn"),
   teamSyncContent: document.getElementById("teamSyncContent"),
+  filtersToggleBtn: document.getElementById("filtersToggleBtn"),
+  filtersContent: document.getElementById("filtersContent"),
+  onboardingBoardToggleBtn: document.getElementById("onboardingBoardToggleBtn"),
+  onboardingBoardContent: document.getElementById("onboardingBoardContent"),
+  fulfillmentBoardToggleBtn: document.getElementById("fulfillmentBoardToggleBtn"),
+  fulfillmentBoardContent: document.getElementById("fulfillmentBoardContent"),
+  clientDetailToggleBtn: document.getElementById("clientDetailToggleBtn"),
+  clientDetailContent: document.getElementById("clientDetailContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -137,16 +145,27 @@ function bindEvents() {
   els.seedDemoBtn.addEventListener("click", seedDemoData);
   els.downloadDataBtn.addEventListener("click", exportData);
   els.importDataInput.addEventListener("change", importData);
-  if (els.intakeMetricsToggleBtn && els.intakeMetricsContent) {
-    els.intakeMetricsToggleBtn.addEventListener("click", () => {
-      togglePanelSection(els.intakeMetricsToggleBtn, els.intakeMetricsContent);
+  const panelToggles = [
+    ["intakeMetricsToggleBtn", "intakeMetricsContent"],
+    ["teamSyncToggleBtn", "teamSyncContent"],
+    ["filtersToggleBtn", "filtersContent"],
+    ["onboardingBoardToggleBtn", "onboardingBoardContent"],
+    ["fulfillmentBoardToggleBtn", "fulfillmentBoardContent"],
+    ["clientDetailToggleBtn", "clientDetailContent"]
+  ];
+
+  panelToggles.forEach(([toggleKey, contentKey]) => {
+    const toggleBtn = els[toggleKey];
+    const contentEl = els[contentKey];
+
+    if (!toggleBtn || !contentEl) {
+      return;
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      togglePanelSection(toggleBtn, contentEl);
     });
-  }
-  if (els.teamSyncToggleBtn && els.teamSyncContent) {
-    els.teamSyncToggleBtn.addEventListener("click", () => {
-      togglePanelSection(els.teamSyncToggleBtn, els.teamSyncContent);
-    });
-  }
+  });
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {

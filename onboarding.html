@@ -151,82 +151,130 @@
       </section>
 
       <section class="panel filters-panel">
-        <h2>Filters</h2>
-        <div class="filters">
-          <label>
-            Search
-            <input id="searchInput" type="text" placeholder="name, company, product" />
-          </label>
-          <label>
-            Owner
-            <select id="ownerFilter">
-              <option value="all">All</option>
-            </select>
-          </label>
-          <label>
-            Product
-            <select id="productFilter">
-              <option value="all">All</option>
-            </select>
-          </label>
-          <label>
-            Payment
-            <select id="paymentFilter">
-              <option value="all">All</option>
-              <option value="not-sent">Not Sent</option>
-              <option value="sent">Sent</option>
-              <option value="paid">Paid</option>
-              <option value="issue">Issue</option>
-            </select>
-          </label>
-          <label>
-            Form
-            <select id="formFilter">
-              <option value="all">All</option>
-              <option value="not-sent">Not Sent</option>
-              <option value="sent">Sent</option>
-              <option value="completed">Completed</option>
-            </select>
-          </label>
-          <label>
-            Pipeline
-            <select id="pipelineFilter">
-              <option value="all">All</option>
-              <option value="onboarding">Onboarding</option>
-              <option value="fulfillment">Fulfillment</option>
-            </select>
-          </label>
-          <label>
-            Activity
-            <select id="idleFilter">
-              <option value="all">Any</option>
-              <option value="idle-5">Idle 5+ days</option>
-              <option value="idle-10">Idle 10+ days</option>
-            </select>
-          </label>
+        <div class="panel-collapse-head">
+          <h2>Filters</h2>
+          <button
+            id="filtersToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="filtersContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="filtersContent" class="collapsible-content">
+          <div class="filters">
+            <label>
+              Search
+              <input id="searchInput" type="text" placeholder="name, company, product" />
+            </label>
+            <label>
+              Owner
+              <select id="ownerFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              Product
+              <select id="productFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              Payment
+              <select id="paymentFilter">
+                <option value="all">All</option>
+                <option value="not-sent">Not Sent</option>
+                <option value="sent">Sent</option>
+                <option value="paid">Paid</option>
+                <option value="issue">Issue</option>
+              </select>
+            </label>
+            <label>
+              Form
+              <select id="formFilter">
+                <option value="all">All</option>
+                <option value="not-sent">Not Sent</option>
+                <option value="sent">Sent</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
+            <label>
+              Pipeline
+              <select id="pipelineFilter">
+                <option value="all">All</option>
+                <option value="onboarding">Onboarding</option>
+                <option value="fulfillment">Fulfillment</option>
+              </select>
+            </label>
+            <label>
+              Activity
+              <select id="idleFilter">
+                <option value="all">Any</option>
+                <option value="idle-5">Idle 5+ days</option>
+                <option value="idle-10">Idle 10+ days</option>
+              </select>
+            </label>
+          </div>
         </div>
       </section>
 
       <section class="panel board-panel">
-        <div class="panel-head">
+        <div class="panel-collapse-head">
           <h2>Onboarding Board</h2>
-          <p>Drag cards across columns as clients progress.</p>
+          <button
+            id="onboardingBoardToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="onboardingBoardContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
         </div>
-        <div id="onboardingBoard" class="kanban-board"></div>
+        <div id="onboardingBoardContent" class="collapsible-content">
+          <p class="panel-note">Drag cards across columns as clients progress.</p>
+          <div id="onboardingBoard" class="kanban-board"></div>
+        </div>
       </section>
 
       <section class="panel board-panel">
-        <div class="panel-head">
+        <div class="panel-collapse-head">
           <h2>Fulfillment Board</h2>
-          <p>Track delivery progress until completion.</p>
+          <button
+            id="fulfillmentBoardToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="fulfillmentBoardContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
         </div>
-        <div id="fulfillmentBoard" class="kanban-board"></div>
+        <div id="fulfillmentBoardContent" class="collapsible-content">
+          <p class="panel-note">Track delivery progress until completion.</p>
+          <div id="fulfillmentBoard" class="kanban-board"></div>
+        </div>
       </section>
 
       <section class="panel detail-panel">
-        <h2>Client Detail</h2>
-        <div id="clientDetail" class="detail-empty">
-          Select a client card to edit profile, tasks, notes, and stage details.
+        <div class="panel-collapse-head">
+          <h2>Client Detail</h2>
+          <button
+            id="clientDetailToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="clientDetailContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="clientDetailContent" class="collapsible-content">
+          <div id="clientDetail" class="detail-empty">
+            Select a client card to edit profile, tasks, notes, and stage details.
+          </div>
         </div>
       </section>
     </main>
