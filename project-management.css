@@ -585,8 +585,8 @@ button.pm-danger {
 }
 
 .pm-task-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(132px, auto) auto;
   align-items: center;
   gap: 8px;
 }
@@ -604,18 +604,9 @@ button.pm-danger {
 
 .pm-task-meta {
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.pm-task-item.pm-owner-jesse {
-  border-color: #c8dff3;
-  background: #f3f8ff;
-}
-
-.pm-task-item.pm-owner-giles {
-  border-color: #bfdcc3;
-  background: #f2fbf2;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .pm-task-owner-chip {
@@ -640,8 +631,9 @@ button.pm-danger {
 
 .pm-task-check {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  min-width: 0;
 }
 
 .pm-task-check input {
@@ -651,6 +643,81 @@ button.pm-danger {
   border: 0;
   margin: 0;
   accent-color: var(--pm-brand);
+}
+
+.pm-task-title {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.pm-task-title.is-done {
+  font-weight: 500;
+}
+
+.pm-status-chip {
+  border-radius: 999px;
+  border: 1px solid #c9d7cf;
+  background: #f4f8f6;
+  color: #2f5849;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  width: fit-content;
+}
+
+.pm-status-todo {
+  border-color: #efbcbc;
+  background: #fbecec;
+  color: #8a2222;
+}
+
+.pm-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+  color: #8f5415;
+}
+
+.pm-status-done {
+  border-color: #9fd0b4;
+  background: #e9f7ef;
+  color: #1f6b4e;
+}
+
+.pm-task-status {
+  min-width: 132px;
+}
+
+select.pm-task-status.pm-status-todo {
+  border-color: #efbcbc;
+  background: #fbecec;
+  color: #8a2222;
+}
+
+select.pm-task-status.pm-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+  color: #8f5415;
+}
+
+select.pm-task-status.pm-status-done {
+  border-color: #9fd0b4;
+  background: #ebf7f0;
+  color: #1f6b4e;
+}
+
+.pm-task-item.pm-status-todo {
+  border-color: #efbcbc;
+  background: #fff5f5;
+}
+
+.pm-task-item.pm-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff9ef;
+}
+
+.pm-task-item.pm-status-done {
+  border-color: #a7d5ba;
+  background: #eff9f2;
 }
 
 .pm-detail-grid input[type="checkbox"] {
@@ -703,10 +770,18 @@ button.pm-danger {
 }
 
 .pm-task-form {
-  margin-top: 10px;
+  margin-bottom: 10px;
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  grid-template-columns: minmax(140px, auto) minmax(0, 1fr) minmax(132px, auto) auto;
+  border: 1px solid var(--pm-line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+
+.pm-task-form label {
+  margin: 0;
 }
 
 .pm-task-form button {
@@ -767,5 +842,19 @@ button.pm-danger {
 
   .pm-board {
     grid-auto-columns: minmax(220px, 84vw);
+  }
+
+  .pm-task-form,
+  .pm-task-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pm-task-form button {
+    justify-self: start;
+  }
+
+  .pm-task-status {
+    min-width: 0;
+    width: 100%;
   }
 }

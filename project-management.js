@@ -26,6 +26,12 @@ const PM_OWNER_OPTIONS = [
   { value: "Giles", label: "Giles" }
 ];
 
+const PM_TASK_STATUS = [
+  { value: "todo", label: "To Do" },
+  { value: "in-progress", label: "In Progress" },
+  { value: "done", label: "Done" }
+];
+
 const state = {
   projects: [],
   deletedRecords: [],
@@ -302,9 +308,10 @@ function seedDemoProjects() {
       blocked: sample.blocked,
       description: sample.description,
       tasks: sample.tasks.map((task) => ({
+        status: normalizeTaskStatus(task.status || (task.done ? "done" : "todo")),
         id: uid("task"),
         title: task.title,
-        done: Boolean(task.done),
+        done: normalizeTaskStatus(task.status || (task.done ? "done" : "todo")) === "done",
         assignee: normalizeOwner(task.assignee || sample.owner),
         dueDate: "",
         createdAt,
@@ -531,13 +538,15 @@ function handleDetailSubmit(event) {
     }
 
     const assignee = normalizeOwner(formData.get("assignee"));
+    const status = normalizeTaskStatus(formData.get("status"));
 
     const task = {
       id: uid("task"),
       title,
-      done: false,
+      status,
+      done: status === "done",
       assignee,
-      dueDate: normalizeDateOnly(formData.get("dueDate")),
+      dueDate: "",
       createdAt: isoNow(),
       updatedAt: isoNow()
     };
@@ -552,7 +561,7 @@ function handleDetailSubmit(event) {
 
 function handleDetailChange(event) {
   const action = event.target.dataset.action;
-  if (action !== "task-toggle") {
+  if (action !== "task-toggle" && action !== "task-status") {
     return;
   }
 
@@ -566,9 +575,26 @@ function handleDetailChange(event) {
     return;
   }
 
-  task.done = Boolean(event.target.checked);
+  const previousStatus = normalizeTaskStatus(task.status || (task.done ? "done" : "todo"));
+  const previousDone = task.done;
+
+  if (action === "task-toggle") {
+    task.done = Boolean(event.target.checked);
+    task.status = task.done ? "done" : "todo";
+  }
+
+  if (action === "task-status") {
+    task.status = normalizeTaskStatus(event.target.value);
+    task.done = task.status === "done";
+  }
+
+  const nextStatus = normalizeTaskStatus(task.status);
+  if (nextStatus === previousStatus && task.done === previousDone) {
+    return;
+  }
+
   task.updatedAt = isoNow();
-  touchProject(project, `${task.done ? "Completed" : "Reopened"} task: ${task.title}`);
+  touchProject(project, `Task status updated (${task.assignee}): ${task.title} → ${taskStatusLabel(task.status)}`);
   persistSnapshot();
   render();
 }
@@ -736,19 +762,27 @@ function renderDetail() {
   const renderTaskItem = (task) => {
     const assignee = normalizeOwner(task.assignee);
     const ownerClass = ownerThemeClass(assignee);
+    const status = normalizeTaskStatus(task.status || (task.done ? "done" : "todo"));
+    const statusToneClass = taskStatusClass(status);
+    const titleWeightClass = status === "done" ? "is-done" : "is-active";
 
     return `
-      <li class="pm-list-item pm-task-item ${ownerClass}">
+      <li class="pm-list-item pm-task-item ${ownerClass} ${statusToneClass}">
         <div class="pm-task-row">
           <label class="pm-task-check">
-            <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${task.done ? "checked" : ""} />
-            <span>${escapeHtml(task.title)}</span>
+            <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${status === "done" ? "checked" : ""} />
+            <span class="pm-task-title ${titleWeightClass}">${escapeHtml(task.title)}</span>
           </label>
+          <span class="pm-status-chip ${statusToneClass}">${escapeHtml(taskStatusLabel(status))}</span>
+          <select class="pm-task-status ${statusToneClass}" data-action="task-status" data-task-id="${task.id}">
+            ${optionMarkup(PM_TASK_STATUS, status)}
+          </select>
           <button class="pm-ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
         </div>
-        <p class="pm-task-meta"><span class="pm-task-owner-chip ${ownerClass}">${escapeHtml(assignee)}</span> • ${
-          task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"
-        }</p>
+        <p class="pm-task-meta">
+          <span class="pm-task-owner-chip ${ownerClass}">Owner: ${escapeHtml(assignee)}</span>
+          <span>${task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"}</span>
+        </p>
       </li>
     `;
   };
@@ -834,27 +868,28 @@ function renderDetail() {
 
       <section class="pm-detail-section pm-task-section">
         <h3>Tasks</h3>
-        <div class="pm-task-columns">
-          ${taskColumnsMarkup}
-        </div>
         <form id="newTaskForm" class="pm-task-form">
           <label>
-            Task Title
-            <input name="title" required placeholder="Prepare handoff deck" />
-          </label>
-          <label>
-            Assignee
+            Owner
             <select name="assignee" required>
               ${optionMarkup(PM_OWNER_OPTIONS, project.owner)}
             </select>
           </label>
           <label>
-            Due Date
-            <input name="dueDate" type="date" />
+            Task
+            <input name="title" required placeholder="Prepare handoff deck" />
+          </label>
+          <label>
+            Status
+            <select name="status" class="pm-task-status ${taskStatusClass("todo")}" required>
+              ${optionMarkup(PM_TASK_STATUS, "todo")}
+            </select>
           </label>
           <button type="submit">Add Task</button>
         </form>
-
+        <div class="pm-task-columns">
+          ${taskColumnsMarkup}
+        </div>
         <div class="pm-task-timeline">
           <h4>Activity Timeline</h4>
           <ul class="pm-list">${activityMarkup}</ul>
@@ -1274,15 +1309,19 @@ function sanitizeTasks(tasks) {
 
   return tasks
     .filter((task) => task && typeof task === "object")
-    .map((task) => ({
-      id: String(task.id || uid("task")),
-      title: String(task.title || "").trim(),
-      done: Boolean(task.done),
-      assignee: normalizeOwner(task.assignee),
-      dueDate: normalizeDateOnly(task.dueDate),
-      createdAt: normalizeTimestamp(task.createdAt || isoNow()),
-      updatedAt: normalizeTimestamp(task.updatedAt || isoNow())
-    }))
+    .map((task) => {
+      const status = normalizeTaskStatus(task.status || (task.done ? "done" : "todo"));
+      return {
+        id: String(task.id || uid("task")),
+        title: String(task.title || "").trim(),
+        status,
+        done: status === "done",
+        assignee: normalizeOwner(task.assignee),
+        dueDate: normalizeDateOnly(task.dueDate),
+        createdAt: normalizeTimestamp(task.createdAt || isoNow()),
+        updatedAt: normalizeTimestamp(task.updatedAt || isoNow())
+      };
+    })
     .filter((task) => task.title);
 }
 
@@ -1293,6 +1332,28 @@ function normalizeOwner(value) {
 
 function ownerThemeClass(owner) {
   return normalizeOwner(owner) === "Giles" ? "pm-owner-giles" : "pm-owner-jesse";
+}
+
+function normalizeTaskStatus(value) {
+  const status = String(value || "").trim().toLowerCase();
+  return PM_TASK_STATUS.some((item) => item.value === status) ? status : "todo";
+}
+
+function taskStatusLabel(value) {
+  const status = normalizeTaskStatus(value);
+  const match = PM_TASK_STATUS.find((item) => item.value === status);
+  return match ? match.label : "To Do";
+}
+
+function taskStatusClass(value) {
+  const status = normalizeTaskStatus(value);
+  if (status === "done") {
+    return "pm-status-done";
+  }
+  if (status === "in-progress") {
+    return "pm-status-in-progress";
+  }
+  return "pm-status-todo";
 }
 
 function sanitizeActivity(activityItems) {
