@@ -215,7 +215,7 @@ h1 {
 
 .intake-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.9fr);
   gap: 12px;
 }
 
@@ -318,7 +318,7 @@ button.danger {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -597,6 +597,30 @@ button.danger {
 .task-meta {
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+.task-intake-box {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+}
+
+.task-intake-box h4 {
+  margin: 0 0 8px;
+  font-size: 0.86rem;
+  color: #24493d;
+}
+
+.task-intake-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.task-intake-grid button {
+  align-self: end;
 }
 
 .timeline {

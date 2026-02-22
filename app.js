@@ -43,6 +43,11 @@ const TASK_STATUS = [
   { value: "done", label: "Done" }
 ];
 
+const OWNER_OPTIONS = [
+  { value: "Jesse", label: "Jesse" },
+  { value: "Giles", label: "Giles" }
+];
+
 const PRODUCT_OPTIONS = [
   { value: "Front Desk Core $399 recurring/mo", label: "Front Desk Core $399 recurring/mo" },
   { value: "Speed to Lead Follow up $999 recurring/mo", label: "Speed to Lead Follow up $999 recurring/mo" },
@@ -251,7 +256,7 @@ function handleCreateClient(event) {
   const name = String(formData.get("name") || "").trim();
   const company = String(formData.get("company") || "").trim();
   const product = String(formData.get("product") || "").trim();
-  const owner = String(formData.get("owner") || "").trim();
+  const owner = normalizeOwner(formData.get("owner"));
 
   if (!name || !company || !product || !owner) {
     alert("Client name, company, product, and owner are required.");
@@ -331,7 +336,7 @@ function seedDemoData() {
       email: "jordan@beaconwellness.co",
       phone: "(555) 492-1183",
       product: "Speed to Lead Follow up $999 recurring/mo",
-      owner: "Ana",
+      owner: "Giles",
       setupFee: 1000,
       contractValue: 1800,
       pipeline: "onboarding",
@@ -660,7 +665,7 @@ function handleDetailSubmit(event) {
     client.email = String(formData.get("email") || "").trim();
     client.phone = String(formData.get("phone") || "").trim();
     client.product = String(formData.get("product") || "").trim();
-    client.owner = String(formData.get("owner") || "").trim();
+    client.owner = normalizeOwner(formData.get("owner"));
     client.setupFee = safeMoney(formData.get("setupFee"));
     client.contractValue = safeMoney(formData.get("contractValue"));
     client.blockerNote = String(formData.get("blockerNote") || "").trim();
@@ -686,7 +691,7 @@ function handleDetailSubmit(event) {
     const task = {
       id: uid("task"),
       title,
-      owner: String(formData.get("owner") || "").trim(),
+      owner: normalizeOwner(formData.get("owner")),
       dueDate: String(formData.get("dueDate") || ""),
       status: "todo",
       createdAt: isoNow(),
@@ -967,6 +972,8 @@ function renderDetail() {
       ? optionMarkup(ONBOARDING_STAGES.map((s) => ({ value: s.id, label: s.label })), client.stageId)
       : optionMarkup(FULFILLMENT_STAGES.map((s) => ({ value: s.id, label: s.label })), client.stageId);
   const productOptions = productOptionsForClient(client.product);
+  const ownerOptions = ownerOptionsForValue(client.owner);
+  const taskAssigneeDefault = normalizeOwner(client.owner);
 
   const tasksHtml = client.tasks.length
     ? client.tasks
@@ -1047,7 +1054,9 @@ function renderDetail() {
           </label>
           <label>
             Owner
-            <input name="owner" required value="${escapeHtml(client.owner)}" />
+            <select name="owner" required>
+              ${optionMarkup(ownerOptions, client.owner)}
+            </select>
           </label>
           <label>
             Setup Fee
@@ -1094,21 +1103,26 @@ function renderDetail() {
         <section class="detail-section">
           <h3>Tasks</h3>
           <ul class="list">${tasksHtml}</ul>
-          <form id="newTaskForm" class="detail-grid">
-            <label>
-              Task title
-              <input name="title" required placeholder="Send kickoff deck" />
-            </label>
-            <label>
-              Owner
-              <input name="owner" placeholder="Assignee" />
-            </label>
-            <label>
-              Due date
-              <input name="dueDate" type="date" />
-            </label>
-            <button type="submit">Add Task</button>
-          </form>
+          <div class="task-intake-box">
+            <h4>Add New Task</h4>
+            <form id="newTaskForm" class="task-intake-grid">
+              <label>
+                Task title
+                <input name="title" required placeholder="Send kickoff deck" />
+              </label>
+              <label>
+                Assignee
+                <select name="owner" required>
+                  ${optionMarkup(OWNER_OPTIONS, taskAssigneeDefault)}
+                </select>
+              </label>
+              <label>
+                Due date
+                <input name="dueDate" type="date" />
+              </label>
+              <button type="submit">Add Task</button>
+            </form>
+          </div>
         </section>
 
         <section class="detail-section">
@@ -1192,6 +1206,25 @@ function productOptionsForClient(product) {
     { value: current, label: `${current} (legacy)` },
     ...options
   ];
+}
+
+function ownerOptionsForValue(owner) {
+  const current = String(owner || "").trim();
+  const hasCurrent = OWNER_OPTIONS.some((option) => option.value === current);
+
+  if (!current || hasCurrent) {
+    return OWNER_OPTIONS;
+  }
+
+  return [
+    { value: current, label: `${current} (legacy)` },
+    ...OWNER_OPTIONS
+  ];
+}
+
+function normalizeOwner(value) {
+  const owner = String(value || "").trim();
+  return OWNER_OPTIONS.some((option) => option.value === owner) ? owner : "Jesse";
 }
 
 function optionMarkup(options, selectedValue) {
