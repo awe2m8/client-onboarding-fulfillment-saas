@@ -77,6 +77,8 @@ const els = {
   seedDemoBtn: document.getElementById("seedDemoBtn"),
   downloadDataBtn: document.getElementById("downloadDataBtn"),
   importDataInput: document.getElementById("importDataInput"),
+  intakeMetricsToggleBtn: document.getElementById("intakeMetricsToggleBtn"),
+  intakeMetricsContent: document.getElementById("intakeMetricsContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -133,6 +135,11 @@ function bindEvents() {
   els.seedDemoBtn.addEventListener("click", seedDemoData);
   els.downloadDataBtn.addEventListener("click", exportData);
   els.importDataInput.addEventListener("change", importData);
+  if (els.intakeMetricsToggleBtn && els.intakeMetricsContent) {
+    els.intakeMetricsToggleBtn.addEventListener("click", () => {
+      togglePanelSection(els.intakeMetricsToggleBtn, els.intakeMetricsContent);
+    });
+  }
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {
@@ -175,6 +182,14 @@ function bindEvents() {
   els.clientDetail.addEventListener("submit", handleDetailSubmit);
   els.clientDetail.addEventListener("change", handleDetailChange);
   els.clientDetail.addEventListener("click", handleDetailClick);
+}
+
+function togglePanelSection(toggleBtn, contentEl) {
+  const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
+  const nextExpanded = !isExpanded;
+
+  toggleBtn.setAttribute("aria-expanded", String(nextExpanded));
+  contentEl.classList.toggle("is-collapsed", !nextExpanded);
 }
 
 function handleCreateClient(event) {

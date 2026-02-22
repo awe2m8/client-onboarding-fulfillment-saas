@@ -47,6 +47,8 @@ const els = {
   endDateInput: document.getElementById("endDateInput"),
   seedSprintsBtn: document.getElementById("seedSprintsBtn"),
   clearSprintsBtn: document.getElementById("clearSprintsBtn"),
+  sprintTopToggleBtn: document.getElementById("sprintTopToggleBtn"),
+  sprintTopContent: document.getElementById("sprintTopContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -98,6 +100,11 @@ function bindEvents() {
   els.seedSprintsBtn.addEventListener("click", seedDemoSprint);
   els.clearSprintsBtn.addEventListener("click", clearAllSprints);
   els.startDateInput.addEventListener("change", autofillCreateEndDate);
+  if (els.sprintTopToggleBtn && els.sprintTopContent) {
+    els.sprintTopToggleBtn.addEventListener("click", () => {
+      togglePanelSection(els.sprintTopToggleBtn, els.sprintTopContent);
+    });
+  }
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {
@@ -118,6 +125,14 @@ function bindEvents() {
   els.sprintDetail.addEventListener("submit", handleDetailSubmit);
   els.sprintDetail.addEventListener("change", handleDetailChange);
   els.sprintDetail.addEventListener("click", handleDetailClick);
+}
+
+function togglePanelSection(toggleBtn, contentEl) {
+  const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
+  const nextExpanded = !isExpanded;
+
+  toggleBtn.setAttribute("aria-expanded", String(nextExpanded));
+  contentEl.classList.toggle("is-collapsed", !nextExpanded);
 }
 
 function handleCreateSprint(event) {

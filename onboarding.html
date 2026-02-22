@@ -29,71 +29,89 @@
     </header>
 
     <main class="app-shell">
-      <section class="panel intake-panel">
-        <h2>Add New Client</h2>
-        <form id="clientForm" class="client-form">
-          <label>
-            Client Name
-            <input name="name" type="text" required placeholder="Jane Smith" />
-          </label>
-          <label>
-            Company
-            <input name="company" type="text" required placeholder="Acme Co" />
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" placeholder="jane@acme.com" />
-          </label>
-          <label>
-            Phone
-            <input name="phone" type="tel" placeholder="(555) 555-5555" />
-          </label>
-          <label>
-            Product
-            <input name="product" type="text" required placeholder="Website Build" />
-          </label>
-          <label>
-            Owner
-            <input name="owner" type="text" required placeholder="Jesse" />
-          </label>
-          <label>
-            Contract Value (USD)
-            <input name="contractValue" type="number" min="0" step="0.01" placeholder="2500" />
-          </label>
-          <label>
-            Onboarding Form
-            <select name="formStatus">
-              <option value="not-sent">Not Sent</option>
-              <option value="sent">Sent</option>
-              <option value="completed">Completed</option>
-            </select>
-          </label>
-          <label>
-            Payment Status
-            <select name="paymentStatus">
-              <option value="not-sent">Not Sent</option>
-              <option value="sent">Sent</option>
-              <option value="paid">Paid</option>
-              <option value="issue">Issue</option>
-            </select>
-          </label>
-          <div class="form-actions">
-            <button type="submit">Create Client</button>
-            <button id="seedDemoBtn" type="button" class="ghost">Load Demo Data</button>
-            <button id="clearDataBtn" type="button" class="danger">Clear All Data</button>
-          </div>
-        </form>
-      </section>
+      <section class="panel intake-metrics-panel">
+        <div class="panel-collapse-head">
+          <h2>Client Intake and Snapshot</h2>
+          <button
+            id="intakeMetricsToggleBtn"
+            class="panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="intakeMetricsContent"
+          >
+            <span class="panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="intakeMetricsContent" class="collapsible-content">
+          <div class="intake-metrics-grid">
+            <section class="sub-panel">
+              <h3>Add New Client</h3>
+              <form id="clientForm" class="client-form">
+                <label>
+                  Client Name
+                  <input name="name" type="text" required placeholder="Jane Smith" />
+                </label>
+                <label>
+                  Company
+                  <input name="company" type="text" required placeholder="Acme Co" />
+                </label>
+                <label>
+                  Email
+                  <input name="email" type="email" placeholder="jane@acme.com" />
+                </label>
+                <label>
+                  Phone
+                  <input name="phone" type="tel" placeholder="(555) 555-5555" />
+                </label>
+                <label>
+                  Product
+                  <input name="product" type="text" required placeholder="Website Build" />
+                </label>
+                <label>
+                  Owner
+                  <input name="owner" type="text" required placeholder="Jesse" />
+                </label>
+                <label>
+                  Contract Value (USD)
+                  <input name="contractValue" type="number" min="0" step="0.01" placeholder="2500" />
+                </label>
+                <label>
+                  Onboarding Form
+                  <select name="formStatus">
+                    <option value="not-sent">Not Sent</option>
+                    <option value="sent">Sent</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </label>
+                <label>
+                  Payment Status
+                  <select name="paymentStatus">
+                    <option value="not-sent">Not Sent</option>
+                    <option value="sent">Sent</option>
+                    <option value="paid">Paid</option>
+                    <option value="issue">Issue</option>
+                  </select>
+                </label>
+                <div class="form-actions">
+                  <button type="submit">Create Client</button>
+                  <button id="seedDemoBtn" type="button" class="ghost">Load Demo Data</button>
+                  <button id="clearDataBtn" type="button" class="danger">Clear All Data</button>
+                </div>
+              </form>
+            </section>
 
-      <section class="panel metrics-panel">
-        <h2>Pipeline Snapshot</h2>
-        <div class="metric-grid">
-          <article><span id="metricTotal">0</span><small>Total Clients</small></article>
-          <article><span id="metricOnboarding">0</span><small>Onboarding</small></article>
-          <article><span id="metricFulfillment">0</span><small>Fulfillment</small></article>
-          <article><span id="metricPaid">0</span><small>Paid</small></article>
-          <article><span id="metricBlocked">0</span><small>Blocked</small></article>
-          <article><span id="metricIdle">0</span><small>Idle 5+ Days</small></article>
+            <section class="sub-panel">
+              <h3>Pipeline Snapshot</h3>
+              <div class="metric-grid">
+                <article><span id="metricTotal">0</span><small>Total Clients</small></article>
+                <article><span id="metricOnboarding">0</span><small>Onboarding</small></article>
+                <article><span id="metricFulfillment">0</span><small>Fulfillment</small></article>
+                <article><span id="metricPaid">0</span><small>Paid</small></article>
+                <article><span id="metricBlocked">0</span><small>Blocked</small></article>
+                <article><span id="metricIdle">0</span><small>Idle 5+ Days</small></article>
+              </div>
+            </section>
+          </div>
         </div>
       </section>
 

@@ -148,6 +148,77 @@ h1 {
   font-size: 0.9rem;
 }
 
+.sp-panel-collapse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sp-panel-collapse-head h2 {
+  margin: 0;
+}
+
+.sp-panel-toggle-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-panel-toggle-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: #fff;
+}
+
+.sp-panel-toggle-icon {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.sp-panel-toggle-btn[aria-expanded="false"] .sp-panel-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.sp-collapsible-content {
+  margin-top: 10px;
+}
+
+.sp-collapsible-content.is-collapsed {
+  display: none;
+}
+
+.sp-top-panel {
+  grid-column: 1 / -1;
+}
+
+.sp-top-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sp-subpanel {
+  border: 1px solid #e0e6df;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fcfdfb;
+}
+
+.sp-subpanel h3 {
+  margin: 0 0 10px;
+  font-size: 1.02rem;
+}
+
 .sp-intake-panel {
   grid-column: span 6;
 }
@@ -650,6 +721,10 @@ select.sp-goal-status.sp-status-done {
 }
 
 @media (max-width: 1150px) {
+  .sp-top-grid {
+    grid-template-columns: 1fr;
+  }
+
   .sp-intake-panel,
   .sp-metrics-panel {
     grid-column: 1 / -1;

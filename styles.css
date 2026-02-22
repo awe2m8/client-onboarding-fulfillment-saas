@@ -154,6 +154,77 @@ h1 {
   font-size: 0.9rem;
 }
 
+.panel-collapse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-collapse-head h2 {
+  margin: 0;
+}
+
+.panel-toggle-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-toggle-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  background: #fff;
+}
+
+.panel-toggle-icon {
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.panel-toggle-btn[aria-expanded="false"] .panel-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.collapsible-content {
+  margin-top: 10px;
+}
+
+.collapsible-content.is-collapsed {
+  display: none;
+}
+
+.intake-metrics-panel {
+  grid-column: 1 / -1;
+}
+
+.intake-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sub-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff, #f9fbf9);
+  padding: 12px;
+}
+
+.sub-panel h3 {
+  margin: 0 0 10px;
+  font-size: 1.02rem;
+}
+
 .intake-panel {
   grid-column: span 6;
 }
@@ -537,6 +608,10 @@ button.danger {
 }
 
 @media (max-width: 1080px) {
+  .intake-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
   .intake-panel,
   .metrics-panel {
     grid-column: 1 / -1;

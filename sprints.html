@@ -24,52 +24,70 @@
     </header>
 
     <main class="sp-shell">
-      <section class="sp-panel sp-intake-panel">
-        <h2>Create Sprint</h2>
-        <form id="sprintForm" class="sp-form">
-          <label>
-            Sprint Name
-            <input name="name" type="text" required placeholder="Sprint 01 - Ops Alignment" />
-          </label>
-          <label>
-            Stage
-            <select name="stageId">
-              <option value="planning">Planning</option>
-              <option value="in-sprint">In Sprint</option>
-              <option value="review">Review &amp; Retro</option>
-              <option value="completed">Completed</option>
-            </select>
-          </label>
-          <label>
-            Start Date
-            <input id="startDateInput" name="startDate" type="date" required />
-          </label>
-          <label>
-            End Date
-            <input id="endDateInput" name="endDate" type="date" required />
-          </label>
-          <label class="sp-form-span-2">
-            Overall Objectives
-            <textarea name="overallGoals" placeholder="Top outcomes for this two-week sprint block."></textarea>
-          </label>
-          <div class="sp-form-actions sp-form-span-2">
-            <button type="submit">Create Sprint</button>
-            <button id="seedSprintsBtn" type="button" class="sp-ghost">Load Demo Sprint</button>
-            <button id="clearSprintsBtn" type="button" class="sp-danger">Clear All Sprints</button>
-          </div>
-        </form>
-        <p class="sp-hint">Target cadence is 14 days per sprint block.</p>
-      </section>
+      <section class="sp-panel sp-top-panel">
+        <div class="sp-panel-collapse-head">
+          <h2>Sprint Planning and Snapshot</h2>
+          <button
+            id="sprintTopToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="sprintTopContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="sprintTopContent" class="sp-collapsible-content">
+          <div class="sp-top-grid">
+            <section class="sp-subpanel">
+              <h3>Create Sprint</h3>
+              <form id="sprintForm" class="sp-form">
+                <label>
+                  Sprint Name
+                  <input name="name" type="text" required placeholder="Sprint 01 - Ops Alignment" />
+                </label>
+                <label>
+                  Stage
+                  <select name="stageId">
+                    <option value="planning">Planning</option>
+                    <option value="in-sprint">In Sprint</option>
+                    <option value="review">Review &amp; Retro</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </label>
+                <label>
+                  Start Date
+                  <input id="startDateInput" name="startDate" type="date" required />
+                </label>
+                <label>
+                  End Date
+                  <input id="endDateInput" name="endDate" type="date" required />
+                </label>
+                <label class="sp-form-span-2">
+                  Overall Objectives
+                  <textarea name="overallGoals" placeholder="Top outcomes for this two-week sprint block."></textarea>
+                </label>
+                <div class="sp-form-actions sp-form-span-2">
+                  <button type="submit">Create Sprint</button>
+                  <button id="seedSprintsBtn" type="button" class="sp-ghost">Load Demo Sprint</button>
+                  <button id="clearSprintsBtn" type="button" class="sp-danger">Clear All Sprints</button>
+                </div>
+              </form>
+              <p class="sp-hint">Target cadence is 14 days per sprint block.</p>
+            </section>
 
-      <section class="sp-panel sp-metrics-panel">
-        <h2>Sprint Snapshot</h2>
-        <div class="sp-metric-grid">
-          <article><span id="metricTotalSprints">0</span><small>Total Sprints</small></article>
-          <article><span id="metricPlanningSprints">0</span><small>Planning</small></article>
-          <article><span id="metricActiveSprints">0</span><small>In Sprint</small></article>
-          <article><span id="metricReviewSprints">0</span><small>Review &amp; Retro</small></article>
-          <article><span id="metricCompletedSprints">0</span><small>Completed</small></article>
-          <article><span id="metricOpenGoals">0</span><small>Open Goals</small></article>
+            <section class="sp-subpanel">
+              <h3>Sprint Snapshot</h3>
+              <div class="sp-metric-grid">
+                <article><span id="metricTotalSprints">0</span><small>Total Sprints</small></article>
+                <article><span id="metricPlanningSprints">0</span><small>Planning</small></article>
+                <article><span id="metricActiveSprints">0</span><small>In Sprint</small></article>
+                <article><span id="metricReviewSprints">0</span><small>Review &amp; Retro</small></article>
+                <article><span id="metricCompletedSprints">0</span><small>Completed</small></article>
+                <article><span id="metricOpenGoals">0</span><small>Open Goals</small></article>
+              </div>
+            </section>
+          </div>
         </div>
       </section>
 
