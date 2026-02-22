@@ -28,6 +28,7 @@ python3 -m http.server 8081
 ```
 Then open:
 - http://localhost:8081
+- http://localhost:8081/onboarding.html (direct onboarding app)
 
 ## Team sync setup (for shared data)
 If you want both partners to use the same live dataset:
@@ -44,7 +45,9 @@ If you want both partners to use the same live dataset:
 6. Keep `Auto sync` on for near-real-time collaboration.
 
 ## Files
-- `/index.html`: main UI layout
+- `/index.html`: launcher page with app badges
+- `/onboarding.html`: onboarding + fulfillment app UI
+- `/launcher.css`: launcher page styling
 - `/styles.css`: styling and responsive layout
 - `/app.js`: app logic (state, kanban, tasks, notes, local storage, team sync)
 - `/api/*`: Render-ready API

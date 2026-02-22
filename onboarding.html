@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Onboarding and Fulfillment</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow bg-glow-left" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-right" aria-hidden="true"></div>
+
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Internal Ops Workspace</p>
+        <h1>Client Onboarding and Fulfillment</h1>
+        <p class="subtitle">
+          Track each client from intake to completed delivery with clear stage ownership.
+        </p>
+      </div>
+      <div class="header-actions">
+        <a class="ghost link-button" href="/">App Launcher</a>
+        <button id="downloadDataBtn" class="ghost">Export JSON</button>
+        <label class="file-upload">
+          Import JSON
+          <input id="importDataInput" type="file" accept="application/json,.json" />
+        </label>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="panel intake-panel">
+        <h2>Add New Client</h2>
+        <form id="clientForm" class="client-form">
+          <label>
+            Client Name
+            <input name="name" type="text" required placeholder="Jane Smith" />
+          </label>
+          <label>
+            Company
+            <input name="company" type="text" required placeholder="Acme Co" />
+          </label>
+          <label>
+            Email
+            <input name="email" type="email" placeholder="jane@acme.com" />
+          </label>
+          <label>
+            Phone
+            <input name="phone" type="tel" placeholder="(555) 555-5555" />
+          </label>
+          <label>
+            Product
+            <input name="product" type="text" required placeholder="Website Build" />
+          </label>
+          <label>
+            Owner
+            <input name="owner" type="text" required placeholder="Jesse" />
+          </label>
+          <label>
+            Contract Value (USD)
+            <input name="contractValue" type="number" min="0" step="0.01" placeholder="2500" />
+          </label>
+          <label>
+            Onboarding Form
+            <select name="formStatus">
+              <option value="not-sent">Not Sent</option>
+              <option value="sent">Sent</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+          <label>
+            Payment Status
+            <select name="paymentStatus">
+              <option value="not-sent">Not Sent</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="issue">Issue</option>
+            </select>
+          </label>
+          <div class="form-actions">
+            <button type="submit">Create Client</button>
+            <button id="seedDemoBtn" type="button" class="ghost">Load Demo Data</button>
+            <button id="clearDataBtn" type="button" class="danger">Clear All Data</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel metrics-panel">
+        <h2>Pipeline Snapshot</h2>
+        <div class="metric-grid">
+          <article><span id="metricTotal">0</span><small>Total Clients</small></article>
+          <article><span id="metricOnboarding">0</span><small>Onboarding</small></article>
+          <article><span id="metricFulfillment">0</span><small>Fulfillment</small></article>
+          <article><span id="metricPaid">0</span><small>Paid</small></article>
+          <article><span id="metricBlocked">0</span><small>Blocked</small></article>
+          <article><span id="metricIdle">0</span><small>Idle 5+ Days</small></article>
+        </div>
+      </section>
+
+      <section class="panel sync-panel">
+        <h2>Team Sync</h2>
+        <div class="sync-grid">
+          <label>
+            API URL
+            <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
+          </label>
+          <label>
+            Workspace Key
+            <input id="workspaceKeyInput" type="text" placeholder="acme-onboarding" />
+          </label>
+          <button id="saveSyncBtn" type="button" class="ghost">Save Connection</button>
+          <button id="pullSharedBtn" type="button">Pull Shared Data</button>
+          <button id="pushSharedBtn" type="button" class="ghost">Push Local Data</button>
+          <label class="inline-toggle">
+            <input id="autoSyncCheckbox" type="checkbox" />
+            Auto sync (push on changes + pull every 15s)
+          </label>
+        </div>
+        <p id="syncStatus" class="sync-status">Local only. Set API URL and workspace key to share data.</p>
+      </section>
+
+      <section class="panel filters-panel">
+        <h2>Filters</h2>
+        <div class="filters">
+          <label>
+            Search
+            <input id="searchInput" type="text" placeholder="name, company, product" />
+          </label>
+          <label>
+            Owner
+            <select id="ownerFilter">
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label>
+            Product
+            <select id="productFilter">
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label>
+            Payment
+            <select id="paymentFilter">
+              <option value="all">All</option>
+              <option value="not-sent">Not Sent</option>
+              <option value="sent">Sent</option>
+              <option value="paid">Paid</option>
+              <option value="issue">Issue</option>
+            </select>
+          </label>
+          <label>
+            Form
+            <select id="formFilter">
+              <option value="all">All</option>
+              <option value="not-sent">Not Sent</option>
+              <option value="sent">Sent</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+          <label>
+            Pipeline
+            <select id="pipelineFilter">
+              <option value="all">All</option>
+              <option value="onboarding">Onboarding</option>
+              <option value="fulfillment">Fulfillment</option>
+            </select>
+          </label>
+          <label>
+            Activity
+            <select id="idleFilter">
+              <option value="all">Any</option>
+              <option value="idle-5">Idle 5+ days</option>
+              <option value="idle-10">Idle 10+ days</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel board-panel">
+        <div class="panel-head">
+          <h2>Onboarding Board</h2>
+          <p>Drag cards across columns as clients progress.</p>
+        </div>
+        <div id="onboardingBoard" class="kanban-board"></div>
+      </section>
+
+      <section class="panel board-panel">
+        <div class="panel-head">
+          <h2>Fulfillment Board</h2>
+          <p>Track delivery progress until completion.</p>
+        </div>
+        <div id="fulfillmentBoard" class="kanban-board"></div>
+      </section>
+
+      <section class="panel detail-panel">
+        <h2>Client Detail</h2>
+        <div id="clientDetail" class="detail-empty">
+          Select a client card to edit profile, tasks, notes, and stage details.
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

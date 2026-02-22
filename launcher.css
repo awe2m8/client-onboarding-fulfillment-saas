@@ -1,0 +1,148 @@
+:root {
+  --bg: #f7f5ee;
+  --ink: #1f2621;
+  --muted: #58615c;
+  --line: #d4dbd3;
+  --panel: rgba(255, 255, 255, 0.9);
+  --accent: #0b7a63;
+  --accent-soft: #e0f3ec;
+  --shadow: 0 14px 34px rgba(31, 35, 28, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background: radial-gradient(circle at 8% 8%, #fff9df 0%, #f7f5ee 34%),
+    radial-gradient(circle at 95% 16%, #dff1ed 0%, transparent 44%),
+    linear-gradient(160deg, #f7f6f0, #f3f4ef 48%, #f8f8f4);
+  font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+.launcher-bg {
+  position: fixed;
+  width: 260px;
+  height: 260px;
+  filter: blur(78px);
+  pointer-events: none;
+}
+
+.launcher-bg-left {
+  left: -70px;
+  top: 48px;
+  background: rgba(11, 122, 99, 0.3);
+}
+
+.launcher-bg-right {
+  right: -80px;
+  top: 280px;
+  background: rgba(239, 126, 86, 0.24);
+}
+
+.launcher-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.launcher-head {
+  margin-bottom: 18px;
+}
+
+.launcher-eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #0b5b49;
+}
+
+.launcher-head h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+}
+
+.launcher-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.app-badge {
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  color: var(--ink);
+  text-decoration: none;
+  display: grid;
+  gap: 8px;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.app-badge strong {
+  font-size: 1.05rem;
+}
+
+.app-badge small {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.app-kicker {
+  width: fit-content;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 999px;
+  border: 1px solid #bfd8ce;
+  padding: 3px 8px;
+  background: #f6fbf9;
+  color: #0d684f;
+  font-weight: 700;
+}
+
+.app-badge-live {
+  border-color: #95cdb9;
+  background: linear-gradient(165deg, #ffffff, #f2faf7 70%, #edf8f3);
+}
+
+.app-badge-live:hover,
+.app-badge-live:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 18px 34px rgba(11, 122, 99, 0.16);
+}
+
+button.app-badge {
+  cursor: not-allowed;
+}
+
+button.app-badge[disabled] {
+  opacity: 0.82;
+}
+
+@media (max-width: 760px) {
+  .launcher-shell {
+    padding: 26px 12px;
+  }
+
+  .launcher-grid {
+    grid-template-columns: 1fr;
+  }
+}
