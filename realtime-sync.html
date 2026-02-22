@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Sync</title>
+    <link rel="stylesheet" href="realtime-sync.css" />
+  </head>
+  <body>
+    <div class="rt-glow rt-glow-left" aria-hidden="true"></div>
+    <div class="rt-glow rt-glow-right" aria-hidden="true"></div>
+
+    <header class="rt-header">
+      <div>
+        <p class="rt-eyebrow">Workspace App</p>
+        <h1>Realtime Sync</h1>
+        <p>High-signal handoffs between business partners with mandatory acknowledgement notes.</p>
+      </div>
+      <nav class="rt-nav" aria-label="App navigation">
+        <a class="rt-link" href="/">App Launcher</a>
+        <a class="rt-link" href="/onboarding.html">Onboarding</a>
+        <a class="rt-link" href="/project-management.html">Project Management</a>
+        <a class="rt-link" href="/sprints.html">Sprints</a>
+      </nav>
+    </header>
+
+    <main class="rt-shell">
+      <section class="rt-panel rt-intake-panel">
+        <div class="rt-panel-head">
+          <h2>Post Update</h2>
+          <p>Strict anti-spam rules are enforced in-app.</p>
+        </div>
+
+        <ul class="rt-rules">
+          <li>Summary must be meaningful (minimum 25 characters).</li>
+          <li>If update type is Loom, a Loom URL is required.</li>
+          <li>Max 3 outstanding items per author until acknowledged.</li>
+          <li>Each outstanding item must be acknowledged with a note by the other partner.</li>
+        </ul>
+
+        <form id="updateForm" class="rt-form">
+          <label>
+            Author
+            <select name="author" required>
+              <option value="Jesse">Jesse</option>
+              <option value="Giles">Giles</option>
+            </select>
+          </label>
+
+          <label>
+            Update Type
+            <select name="type" required>
+              <option value="summary">Summary</option>
+              <option value="loom">Loom</option>
+              <option value="decision">Decision / Blocker</option>
+            </select>
+          </label>
+
+          <label>
+            Urgency
+            <select name="urgency" required>
+              <option value="24h">24 hours</option>
+              <option value="48h">48 hours</option>
+              <option value="72h">72 hours</option>
+              <option value="1w">1 week</option>
+            </select>
+          </label>
+
+          <label>
+            Project
+            <input name="project" required placeholder="Project name" />
+          </label>
+
+          <label>
+            Sprint
+            <input name="sprint" required placeholder="Sprint 04" />
+          </label>
+
+          <label>
+            Loom URL (if Loom type)
+            <input name="loomUrl" type="url" placeholder="https://www.loom.com/share/..." />
+          </label>
+
+          <label class="rt-span-2">
+            Summary
+            <textarea name="summary" required placeholder="Context, request, and what needs to happen next."></textarea>
+          </label>
+
+          <label class="rt-span-2">
+            Action Needed
+            <textarea name="actionNeeded" placeholder="Optional: clearly state what the other person needs to do."></textarea>
+          </label>
+
+          <div class="rt-form-actions">
+            <button type="submit">Post Update</button>
+            <button id="clearResolvedBtn" type="button" class="rt-ghost">Clear Resolved</button>
+          </div>
+        </form>
+
+        <p id="formStatus" class="rt-status">Post concise, actionable updates only.</p>
+      </section>
+
+      <section class="rt-panel rt-outstanding-panel">
+        <div class="rt-panel-head">
+          <h2>Outstanding Items</h2>
+          <span id="outstandingCount" class="rt-count-pill">0</span>
+        </div>
+        <div id="outstandingList" class="rt-list"></div>
+      </section>
+
+      <section class="rt-panel rt-resolved-panel">
+        <div class="rt-panel-head">
+          <h2>Seen / Resolved</h2>
+          <p>Acknowledged updates with confirmation notes.</p>
+        </div>
+        <div id="resolvedList" class="rt-list"></div>
+      </section>
+    </main>
+
+    <script src="realtime-sync.js"></script>
+  </body>
+</html>
