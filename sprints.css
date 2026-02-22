@@ -659,8 +659,13 @@ button.sp-danger {
   min-width: 0;
 }
 
-.sp-goal-check span {
+.sp-goal-title {
   overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.sp-goal-title.is-done {
+  font-weight: 500;
 }
 
 .sp-status-chip {

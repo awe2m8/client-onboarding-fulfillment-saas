@@ -1137,6 +1137,7 @@ function renderGoalItem(goal) {
   const status = normalizeGoalStatus(goal.status);
   const statusLabel = goalStatusLabel(status);
   const statusToneClass = statusClass(status);
+  const titleWeightClass = status === "done" ? "is-done" : "is-active";
   const subtaskListMarkup = subtasks.length
     ? `<ul class="sp-subtask-list">${subtasks.map((item) => renderSubtaskItem(goal, item)).join("")}</ul>`
     : '<p class="sp-empty-state">No sub-tasks yet.</p>';
@@ -1146,7 +1147,7 @@ function renderGoalItem(goal) {
       <div class="sp-goal-row">
         <label class="sp-goal-check">
           <input type="checkbox" data-action="goal-toggle" data-goal-id="${goal.id}" ${goal.done ? "checked" : ""} />
-          <span>${escapeHtml(goal.title)}</span>
+          <span class="sp-goal-title ${titleWeightClass}">${escapeHtml(goal.title)}</span>
         </label>
         <span class="sp-status-chip ${statusToneClass}">${escapeHtml(statusLabel)}</span>
         <select class="sp-goal-status ${statusToneClass}" data-action="goal-status" data-goal-id="${goal.id}">
