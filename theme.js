@@ -1,8 +1,10 @@
 const THEME_GLOBAL_KEY = "ops_theme_global_v1";
 const THEME_APP_KEY_PREFIX = "ops_theme_app_v1_";
+const THEME_DOCK_OPEN_KEY_PREFIX = "ops_theme_dock_open_v1_";
 
 const GLOBAL_THEMES = ["light", "dark"];
 const APP_THEMES = ["inherit", "light", "dark"];
+const memoryThemeStorage = new Map();
 
 function appKeyFromPath(pathname) {
   const clean = String(pathname || "/").toLowerCase();
@@ -34,20 +36,62 @@ function normalizeAppTheme(value) {
   return APP_THEMES.includes(v) ? v : "inherit";
 }
 
+function safeStorageGet(key) {
+  if (!key) {
+    return null;
+  }
+
+  try {
+    const value = window.localStorage.getItem(key);
+    if (value === null || value === undefined) {
+      return memoryThemeStorage.has(key) ? memoryThemeStorage.get(key) : null;
+    }
+    return value;
+  } catch (_error) {
+    return memoryThemeStorage.has(key) ? memoryThemeStorage.get(key) : null;
+  }
+}
+
+function safeStorageSet(key, value) {
+  if (!key) {
+    return;
+  }
+
+  memoryThemeStorage.set(key, value);
+
+  try {
+    window.localStorage.setItem(key, value);
+  } catch (_error) {
+    // Keep in-memory value when persistent storage is not available.
+  }
+}
+
 function getGlobalTheme() {
-  return normalizeGlobalTheme(localStorage.getItem(THEME_GLOBAL_KEY));
+  return normalizeGlobalTheme(safeStorageGet(THEME_GLOBAL_KEY));
 }
 
 function getAppTheme(appKey) {
-  return normalizeAppTheme(localStorage.getItem(`${THEME_APP_KEY_PREFIX}${appKey}`));
+  return normalizeAppTheme(safeStorageGet(`${THEME_APP_KEY_PREFIX}${appKey}`));
 }
 
 function setGlobalTheme(value) {
-  localStorage.setItem(THEME_GLOBAL_KEY, normalizeGlobalTheme(value));
+  safeStorageSet(THEME_GLOBAL_KEY, normalizeGlobalTheme(value));
 }
 
 function setAppTheme(appKey, value) {
-  localStorage.setItem(`${THEME_APP_KEY_PREFIX}${appKey}`, normalizeAppTheme(value));
+  safeStorageSet(`${THEME_APP_KEY_PREFIX}${appKey}`, normalizeAppTheme(value));
+}
+
+function dockOpenStorageKey(appKey) {
+  return `${THEME_DOCK_OPEN_KEY_PREFIX}${appKey}`;
+}
+
+function isDockOpen(appKey) {
+  return safeStorageGet(dockOpenStorageKey(appKey)) !== "0";
+}
+
+function setDockOpen(appKey, isOpen) {
+  safeStorageSet(dockOpenStorageKey(appKey), isOpen ? "1" : "0");
 }
 
 function effectiveTheme(appKey) {
@@ -85,8 +129,8 @@ function buildThemeDock(appKey) {
   const appSelectId = `themeAppSelect-${appKey}`;
 
   dock.innerHTML = `
-    <details class="theme-dock-panel">
-      <summary>Theme</summary>
+    <details class="theme-dock-panel" ${isDockOpen(appKey) ? "open" : ""}>
+      <summary>Theme Controls</summary>
       <div class="theme-dock-content">
         <label for="${globalSelectId}">
           Global
@@ -111,6 +155,7 @@ function buildThemeDock(appKey) {
 
   const globalSelect = dock.querySelector('[data-theme-control="global"]');
   const appSelect = dock.querySelector('[data-theme-control="app"]');
+  const dockPanel = dock.querySelector(".theme-dock-panel");
 
   function syncControls() {
     globalSelect.value = getGlobalTheme();
@@ -133,6 +178,12 @@ function buildThemeDock(appKey) {
     applyTheme(appKey);
     syncControls();
   });
+
+  if (dockPanel) {
+    dockPanel.addEventListener("toggle", () => {
+      setDockOpen(appKey, dockPanel.open);
+    });
+  }
 
   syncControls();
 }
