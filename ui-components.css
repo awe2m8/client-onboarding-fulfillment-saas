@@ -18,6 +18,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html[data-theme="dark"] body {
+  background: radial-gradient(circle at 10% 6%, #1a2528 0%, #0f1518 44%),
+    radial-gradient(circle at 92% 18%, #12333b 0%, transparent 44%),
+    linear-gradient(160deg, #0f1518, #111a1f 48%, #131e23);
+  color: var(--ink, var(--pm-ink, var(--rt-ink, var(--ui-color-text))));
+}
+
 .app-header h1,
 .pm-header h1,
 .sp-header h1,
@@ -40,6 +47,24 @@ body {
 .rt-panel {
   border-radius: var(--ui-radius-lg);
   box-shadow: 0 1px 0 rgba(20, 33, 27, 0.04), 0 10px 22px rgba(20, 33, 27, 0.05);
+}
+
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .pm-panel,
+html[data-theme="dark"] .sp-panel,
+html[data-theme="dark"] .rt-panel {
+  border-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: linear-gradient(180deg, rgba(21, 33, 38, 0.96), rgba(18, 29, 34, 0.94));
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.33);
+}
+
+html[data-theme="dark"] .app-header,
+html[data-theme="dark"] .pm-header,
+html[data-theme="dark"] .sp-header,
+html[data-theme="dark"] .rt-header,
+html[data-theme="dark"] .launcher-section {
+  border-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: linear-gradient(120deg, rgba(19, 31, 36, 0.94), rgba(17, 28, 33, 0.92));
 }
 
 .panel h2,
@@ -78,6 +103,66 @@ button,
 .sp-card,
 .rt-item {
   border-radius: var(--ui-radius-lg);
+}
+
+html[data-theme="dark"] .app-badge,
+html[data-theme="dark"] .pm-card,
+html[data-theme="dark"] .sp-card,
+html[data-theme="dark"] .rt-item,
+html[data-theme="dark"] .list-item,
+html[data-theme="dark"] .pm-list-item,
+html[data-theme="dark"] .sp-list-item {
+  border-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: #152229;
+}
+
+html[data-theme="dark"] .column,
+html[data-theme="dark"] .pm-column,
+html[data-theme="dark"] .sp-column,
+html[data-theme="dark"] .sub-panel,
+html[data-theme="dark"] .pm-subpanel,
+html[data-theme="dark"] .sp-subpanel,
+html[data-theme="dark"] .pm-task-column,
+html[data-theme="dark"] .sp-goal-column {
+  border-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: linear-gradient(180deg, #142128, #111d23);
+}
+
+html[data-theme="dark"] .column-head,
+html[data-theme="dark"] .pm-column-head,
+html[data-theme="dark"] .sp-column-head {
+  border-bottom-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  background: #132026;
+}
+
+html[data-theme="dark"] .column-dropzone,
+html[data-theme="dark"] .pm-dropzone,
+html[data-theme="dark"] .sp-dropzone {
+  background: #101b20;
+}
+
+html[data-theme="dark"] .card-meta,
+html[data-theme="dark"] .card-updated,
+html[data-theme="dark"] .empty-col,
+html[data-theme="dark"] .pm-card-meta,
+html[data-theme="dark"] .pm-card-updated,
+html[data-theme="dark"] .pm-empty-col,
+html[data-theme="dark"] .sp-card-meta,
+html[data-theme="dark"] .sp-card-updated,
+html[data-theme="dark"] .sp-empty-col,
+html[data-theme="dark"] .detail-empty,
+html[data-theme="dark"] .pm-detail-empty,
+html[data-theme="dark"] .sp-detail-empty,
+html[data-theme="dark"] .empty-state,
+html[data-theme="dark"] .pm-empty-state,
+html[data-theme="dark"] .sp-empty-state,
+html[data-theme="dark"] .subtitle,
+html[data-theme="dark"] .launcher-head p,
+html[data-theme="dark"] .launcher-section-head p,
+html[data-theme="dark"] .panel-note,
+html[data-theme="dark"] .pm-panel-note,
+html[data-theme="dark"] .sp-panel-note {
+  color: var(--muted, var(--pm-muted, var(--rt-muted, var(--ui-color-muted))));
 }
 
 .app-badge:focus-visible {
@@ -203,6 +288,58 @@ button.rt-ghost:hover,
   padding: 12px;
 }
 
+.theme-dock {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2200;
+}
+
+.theme-dock-panel {
+  border: 1px solid var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 22px rgba(21, 30, 25, 0.16);
+  backdrop-filter: blur(6px);
+}
+
+html[data-theme="dark"] .theme-dock-panel {
+  background: rgba(18, 29, 34, 0.92);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+.theme-dock-panel > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink, var(--pm-ink, var(--rt-ink, var(--ui-color-text))));
+  user-select: none;
+}
+
+.theme-dock-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.theme-dock-panel[open] > summary {
+  border-bottom: 1px solid var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+}
+
+.theme-dock-content {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  min-width: 190px;
+}
+
+.theme-dock-content label {
+  display: grid;
+  gap: 4px;
+  color: var(--muted, var(--pm-muted, var(--rt-muted, var(--ui-color-muted))));
+  font-size: 0.78rem;
+}
+
 /* Improve keyboard discoverability on control clusters. */
 .form-actions button:focus-visible,
 .pm-form-actions button:focus-visible,
@@ -224,5 +361,10 @@ button.rt-ghost:hover,
   .sp-panel,
   .rt-panel {
     padding: var(--ui-space-3);
+  }
+
+  .theme-dock {
+    right: 10px;
+    bottom: 10px;
   }
 }

@@ -32,6 +32,13 @@ Then open:
 - http://localhost:8081/project-management.html (project management app)
 - http://localhost:8081/sprints.html (sprint planning + retro app)
 
+## Theme controls (global + per-app)
+Every app now includes a Theme dock (bottom-right):
+- `Global`: sets light/dark for all apps
+- `This App`: `Use Global`, `Light`, or `Dark` override for the current app only
+
+Theme preferences persist in browser local storage.
+
 ## Accessibility smoke check
 Run this from the repo root before pushing UI changes:
 

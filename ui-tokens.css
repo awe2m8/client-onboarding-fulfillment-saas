@@ -58,6 +58,23 @@
   --rt-shadow: var(--ui-shadow-md);
 }
 
+html[data-theme="dark"] {
+  --ui-color-bg: #0f1518;
+  --ui-color-surface: #121c21;
+  --ui-color-surface-soft: #17242a;
+  --ui-color-text: #e7eeea;
+  --ui-color-muted: #b1bfba;
+  --ui-color-border: #2a3a40;
+  --ui-color-brand: #33b392;
+  --ui-color-brand-dark: #2f9f83;
+  --ui-color-accent: #f29a6e;
+  --ui-color-danger: #e06e6e;
+  --ui-color-warning: #dfaf66;
+  --ui-color-success: #67c59a;
+  --ui-shadow-md: 0 14px 30px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
 body {
   font-family: var(--ui-font-family);
 }
