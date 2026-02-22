@@ -21,6 +21,11 @@ const PM_PRIORITIES = [
   { value: "critical", label: "Critical" }
 ];
 
+const PM_OWNER_OPTIONS = [
+  { value: "Jesse", label: "Jesse" },
+  { value: "Giles", label: "Giles" }
+];
+
 const state = {
   projects: [],
   deletedRecords: [],
@@ -182,9 +187,9 @@ function handleCreateProject(event) {
   const formData = new FormData(event.currentTarget);
 
   const name = String(formData.get("name") || "").trim();
-  const owner = String(formData.get("owner") || "").trim();
-  if (!name || !owner) {
-    alert("Project name and owner are required.");
+  const owner = normalizeOwner(formData.get("owner"));
+  if (!name) {
+    alert("Project name is required.");
     return;
   }
 
@@ -256,7 +261,7 @@ function seedDemoProjects() {
     {
       name: "Beacon SEO Retainer Setup",
       client: "Beacon Wellness",
-      owner: "Ana",
+      owner: "Giles",
       priority: "medium",
       dueDate: dateOnly(new Date(now.getTime() + 21 * 86400000)),
       stageId: "planning",
@@ -300,6 +305,7 @@ function seedDemoProjects() {
         id: uid("task"),
         title: task.title,
         done: Boolean(task.done),
+        assignee: normalizeOwner(task.assignee || sample.owner),
         dueDate: "",
         createdAt,
         updatedAt: createdAt
@@ -483,10 +489,10 @@ function handleDetailSubmit(event) {
   if (form.id === "detailProjectForm") {
     const formData = new FormData(form);
     const name = String(formData.get("name") || "").trim();
-    const owner = String(formData.get("owner") || "").trim();
+    const owner = normalizeOwner(formData.get("owner"));
 
-    if (!name || !owner) {
-      alert("Project name and owner are required.");
+    if (!name) {
+      alert("Project name is required.");
       return;
     }
 
@@ -524,17 +530,20 @@ function handleDetailSubmit(event) {
       return;
     }
 
+    const assignee = normalizeOwner(formData.get("assignee"));
+
     const task = {
       id: uid("task"),
       title,
       done: false,
+      assignee,
       dueDate: normalizeDateOnly(formData.get("dueDate")),
       createdAt: isoNow(),
       updatedAt: isoNow()
     };
 
     project.tasks.unshift(task);
-    touchProject(project, `Task added: ${task.title}`);
+    touchProject(project, `Task added: ${task.title} (${task.assignee})`);
     form.reset();
     persistSnapshot();
     render();
@@ -736,7 +745,9 @@ function renderDetail() {
                 </label>
                 <button class="pm-ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
               </div>
-              <p class="pm-task-meta">${task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"}</p>
+              <p class="pm-task-meta">Assigned to ${escapeHtml(task.assignee || "Jesse")} • ${
+                task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"
+              }</p>
             </li>
           `
         )
@@ -771,7 +782,9 @@ function renderDetail() {
           </label>
           <label>
             Owner
-            <input name="owner" required value="${escapeHtml(project.owner)}" />
+            <select name="owner" required>
+              ${optionMarkup(PM_OWNER_OPTIONS, project.owner)}
+            </select>
           </label>
           <label>
             Priority
@@ -804,28 +817,32 @@ function renderDetail() {
         </div>
       </form>
 
-      <div class="pm-detail-grid">
-        <section class="pm-detail-section">
-          <h3>Tasks</h3>
-          <ul class="pm-list pm-task-list">${taskMarkup}</ul>
-          <form id="newTaskForm" class="pm-detail-grid">
-            <label>
-              Task Title
-              <input name="title" required placeholder="Prepare handoff deck" />
-            </label>
-            <label>
-              Due Date
-              <input name="dueDate" type="date" />
-            </label>
-            <button type="submit">Add Task</button>
-          </form>
-        </section>
+      <section class="pm-detail-section pm-task-section">
+        <h3>Tasks</h3>
+        <ul class="pm-list pm-task-list">${taskMarkup}</ul>
+        <form id="newTaskForm" class="pm-task-form">
+          <label>
+            Task Title
+            <input name="title" required placeholder="Prepare handoff deck" />
+          </label>
+          <label>
+            Assignee
+            <select name="assignee" required>
+              ${optionMarkup(PM_OWNER_OPTIONS, project.owner)}
+            </select>
+          </label>
+          <label>
+            Due Date
+            <input name="dueDate" type="date" />
+          </label>
+          <button type="submit">Add Task</button>
+        </form>
 
-        <section class="pm-detail-section pm-timeline">
-          <h3>Activity Timeline</h3>
+        <div class="pm-task-timeline">
+          <h4>Activity Timeline</h4>
           <ul class="pm-list">${activityMarkup}</ul>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   `;
 }
@@ -1209,8 +1226,8 @@ function sanitizeProject(input) {
   }
 
   const name = String(input.name || "").trim();
-  const owner = String(input.owner || "").trim();
-  if (!name || !owner) {
+  const owner = normalizeOwner(input.owner);
+  if (!name) {
     return null;
   }
 
@@ -1244,11 +1261,17 @@ function sanitizeTasks(tasks) {
       id: String(task.id || uid("task")),
       title: String(task.title || "").trim(),
       done: Boolean(task.done),
+      assignee: normalizeOwner(task.assignee),
       dueDate: normalizeDateOnly(task.dueDate),
       createdAt: normalizeTimestamp(task.createdAt || isoNow()),
       updatedAt: normalizeTimestamp(task.updatedAt || isoNow())
     }))
     .filter((task) => task.title);
+}
+
+function normalizeOwner(value) {
+  const owner = String(value || "").trim();
+  return PM_OWNER_OPTIONS.some((option) => option.value === owner) ? owner : "Jesse";
 }
 
 function sanitizeActivity(activityItems) {
