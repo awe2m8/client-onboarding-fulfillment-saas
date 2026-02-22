@@ -37,6 +37,7 @@ const state = {
   deletedRecords: [],
   selectedProjectId: null,
   dragProjectId: null,
+  dragTaskId: null,
   filters: {
     search: "",
     owner: "all",
@@ -178,6 +179,10 @@ function bindEvents() {
   els.projectDetail.addEventListener("submit", handleDetailSubmit);
   els.projectDetail.addEventListener("change", handleDetailChange);
   els.projectDetail.addEventListener("click", handleDetailClick);
+  els.projectDetail.addEventListener("dragstart", handleTaskDragStart);
+  els.projectDetail.addEventListener("dragover", handleTaskDragOver);
+  els.projectDetail.addEventListener("drop", handleTaskDrop);
+  els.projectDetail.addEventListener("dragend", handleTaskDragEnd);
 }
 
 function togglePanelSection(toggleBtn, contentEl) {
@@ -635,6 +640,190 @@ function handleDetailClick(event) {
   }
 }
 
+function handleTaskDragStart(event) {
+  const taskItem = event.target.closest(".pm-task-item");
+  if (!taskItem) {
+    return;
+  }
+
+  state.dragTaskId = String(taskItem.dataset.taskId || "").trim();
+  if (!state.dragTaskId) {
+    return;
+  }
+
+  const project = getSelectedProject();
+  if (!project || !project.tasks.some((task) => task.id === state.dragTaskId)) {
+    state.dragTaskId = null;
+    return;
+  }
+
+  taskItem.classList.add("is-dragging");
+
+  if (event.dataTransfer) {
+    event.dataTransfer.setData("text/plain", state.dragTaskId);
+    event.dataTransfer.effectAllowed = "move";
+  }
+}
+
+function handleTaskDragOver(event) {
+  const taskList = event.target.closest(".pm-task-list");
+  if (!taskList || !state.dragTaskId) {
+    return;
+  }
+
+  const project = getSelectedProject();
+  if (!project) {
+    return;
+  }
+
+  const draggedTask = project.tasks.find((task) => task.id === state.dragTaskId);
+  if (!draggedTask) {
+    return;
+  }
+
+  const listOwner = String(taskList.dataset.owner || "").trim();
+  if (!listOwner || normalizeOwner(draggedTask.assignee) !== listOwner) {
+    return;
+  }
+
+  event.preventDefault();
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  clearTaskDropIndicators();
+
+  const beforeElement = taskItemAfterPointer(taskList, event.clientY);
+  if (beforeElement) {
+    beforeElement.classList.add("drop-before");
+  } else {
+    taskList.classList.add("drop-at-end");
+  }
+}
+
+function handleTaskDrop(event) {
+  const taskList = event.target.closest(".pm-task-list");
+  if (!taskList || !state.dragTaskId) {
+    return;
+  }
+
+  const project = getSelectedProject();
+  if (!project) {
+    clearTaskDragState();
+    return;
+  }
+
+  const draggedTask = project.tasks.find((task) => task.id === state.dragTaskId);
+  if (!draggedTask) {
+    clearTaskDragState();
+    return;
+  }
+
+  const listOwner = String(taskList.dataset.owner || "").trim();
+  if (!listOwner || normalizeOwner(draggedTask.assignee) !== listOwner) {
+    clearTaskDragState();
+    return;
+  }
+
+  event.preventDefault();
+
+  const beforeElement = taskItemAfterPointer(taskList, event.clientY);
+  const beforeTaskId = beforeElement ? String(beforeElement.dataset.taskId || "").trim() : "";
+  const didReorder = reorderOwnerTasks(project, draggedTask.id, listOwner, beforeTaskId);
+
+  clearTaskDragState();
+
+  if (!didReorder) {
+    return;
+  }
+
+  touchProject(project, `Reordered ${listOwner} tasks`);
+  persistSnapshot();
+  render();
+}
+
+function handleTaskDragEnd() {
+  clearTaskDragState();
+}
+
+function clearTaskDragState() {
+  state.dragTaskId = null;
+  clearTaskDropIndicators();
+
+  document.querySelectorAll(".pm-task-item.is-dragging").forEach((node) => {
+    node.classList.remove("is-dragging");
+  });
+}
+
+function clearTaskDropIndicators() {
+  document.querySelectorAll(".pm-task-item.drop-before").forEach((node) => {
+    node.classList.remove("drop-before");
+  });
+
+  document.querySelectorAll(".pm-task-list.drop-at-end").forEach((node) => {
+    node.classList.remove("drop-at-end");
+  });
+}
+
+function taskItemAfterPointer(taskList, pointerY) {
+  const candidates = Array.from(taskList.querySelectorAll(".pm-task-item:not(.is-dragging)"));
+  let closest = {
+    offset: Number.NEGATIVE_INFINITY,
+    element: null
+  };
+
+  candidates.forEach((candidate) => {
+    const rect = candidate.getBoundingClientRect();
+    const offset = pointerY - rect.top - rect.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      closest = {
+        offset,
+        element: candidate
+      };
+    }
+  });
+
+  return closest.element;
+}
+
+function reorderOwnerTasks(project, taskId, owner, beforeTaskId) {
+  const ownerTasks = project.tasks.filter((task) => normalizeOwner(task.assignee) === owner);
+  const originalOrder = ownerTasks.map((task) => task.id);
+  const fromIndex = ownerTasks.findIndex((task) => task.id === taskId);
+
+  if (fromIndex < 0) {
+    return false;
+  }
+
+  const [moved] = ownerTasks.splice(fromIndex, 1);
+
+  let insertIndex = ownerTasks.length;
+  if (beforeTaskId) {
+    const candidateIndex = ownerTasks.findIndex((task) => task.id === beforeTaskId);
+    insertIndex = candidateIndex >= 0 ? candidateIndex : ownerTasks.length;
+  }
+
+  ownerTasks.splice(insertIndex, 0, moved);
+
+  const nextOrder = ownerTasks.map((task) => task.id);
+  if (nextOrder.join("|") === originalOrder.join("|")) {
+    return false;
+  }
+
+  let ownerCursor = 0;
+  project.tasks = project.tasks.map((task) => {
+    if (normalizeOwner(task.assignee) !== owner) {
+      return task;
+    }
+    const replacement = ownerTasks[ownerCursor];
+    ownerCursor += 1;
+    return replacement || task;
+  });
+
+  return true;
+}
+
 function touchProject(project, message) {
   const now = isoNow();
   project.updatedAt = now;
@@ -767,7 +956,7 @@ function renderDetail() {
     const titleWeightClass = status === "done" ? "is-done" : "is-active";
 
     return `
-      <li class="pm-list-item pm-task-item ${ownerClass} ${statusToneClass}">
+      <li class="pm-list-item pm-task-item ${ownerClass} ${statusToneClass}" data-task-id="${task.id}" draggable="true">
         <div class="pm-task-row">
           <label class="pm-task-check">
             <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${status === "done" ? "checked" : ""} />
@@ -792,7 +981,7 @@ function renderDetail() {
     const ownerClass = ownerThemeClass(owner);
     const ownerTasks = project.tasks.filter((task) => normalizeOwner(task.assignee) === owner);
     const listMarkup = ownerTasks.length
-      ? `<ul class="pm-list pm-task-list">${ownerTasks.map(renderTaskItem).join("")}</ul>`
+      ? `<ul class="pm-list pm-task-list" data-owner="${escapeHtml(owner)}">${ownerTasks.map(renderTaskItem).join("")}</ul>`
       : '<p class="pm-empty-state">No tasks yet.</p>';
 
     return `

@@ -720,6 +720,27 @@ select.pm-task-status.pm-status-done {
   background: #eff9f2;
 }
 
+.pm-task-item {
+  cursor: grab;
+}
+
+.pm-task-item:active {
+  cursor: grabbing;
+}
+
+.pm-task-item.is-dragging {
+  opacity: 0.55;
+}
+
+.pm-task-item.drop-before {
+  border-top: 3px solid #0b7a63;
+}
+
+.pm-task-list.drop-at-end {
+  box-shadow: inset 0 -3px 0 rgba(11, 122, 99, 0.78);
+  border-radius: 8px;
+}
+
 .pm-detail-grid input[type="checkbox"] {
   width: 16px;
   height: 16px;
