@@ -666,6 +666,42 @@ button.pm-danger {
   grid-column: 1 / -1;
 }
 
+.pm-task-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pm-task-column {
+  border: 1px solid var(--pm-line);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+}
+
+.pm-task-column h4 {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+}
+
+.pm-task-column.pm-owner-jesse {
+  border-color: #bfd7ee;
+  background: linear-gradient(180deg, #f4f9ff, #eef6ff);
+}
+
+.pm-task-column.pm-owner-giles {
+  border-color: #b9dfc1;
+  background: linear-gradient(180deg, #f2fbf2, #edf8ee);
+}
+
+.pm-task-column.pm-owner-jesse h4 {
+  color: #1f4f79;
+}
+
+.pm-task-column.pm-owner-giles h4 {
+  color: #245f35;
+}
+
 .pm-task-form {
   margin-top: 10px;
   display: grid;
@@ -724,7 +760,8 @@ button.pm-danger {
   }
 
   .pm-metric-grid,
-  .pm-filters {
+  .pm-filters,
+  .pm-task-columns {
     grid-template-columns: 1fr;
   }
 

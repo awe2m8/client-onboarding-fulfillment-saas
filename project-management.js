@@ -733,31 +733,41 @@ function renderDetail() {
     return;
   }
 
-  const taskMarkup = project.tasks.length
-    ? project.tasks
-        .map(
-          (task) => {
-            const assignee = normalizeOwner(task.assignee);
-            const ownerClass = ownerThemeClass(assignee);
+  const renderTaskItem = (task) => {
+    const assignee = normalizeOwner(task.assignee);
+    const ownerClass = ownerThemeClass(assignee);
 
-            return `
-            <li class="pm-list-item pm-task-item ${ownerClass}">
-              <div class="pm-task-row">
-                <label class="pm-task-check">
-                  <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${task.done ? "checked" : ""} />
-                  <span>${escapeHtml(task.title)}</span>
-                </label>
-                <button class="pm-ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
-              </div>
-              <p class="pm-task-meta"><span class="pm-task-owner-chip ${ownerClass}">${escapeHtml(assignee)}</span> • ${
-                task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"
-              }</p>
-            </li>
-          `;
-          }
-        )
-        .join("")
-    : '<p class="pm-empty-state">No tasks yet.</p>';
+    return `
+      <li class="pm-list-item pm-task-item ${ownerClass}">
+        <div class="pm-task-row">
+          <label class="pm-task-check">
+            <input type="checkbox" data-action="task-toggle" data-task-id="${task.id}" ${task.done ? "checked" : ""} />
+            <span>${escapeHtml(task.title)}</span>
+          </label>
+          <button class="pm-ghost" type="button" data-action="task-delete" data-task-id="${task.id}">Delete</button>
+        </div>
+        <p class="pm-task-meta"><span class="pm-task-owner-chip ${ownerClass}">${escapeHtml(assignee)}</span> • ${
+          task.dueDate ? `Due ${escapeHtml(formatDate(task.dueDate))}` : "No due date"
+        }</p>
+      </li>
+    `;
+  };
+
+  const taskColumnsMarkup = PM_OWNER_OPTIONS.map((ownerOption) => {
+    const owner = ownerOption.value;
+    const ownerClass = ownerThemeClass(owner);
+    const ownerTasks = project.tasks.filter((task) => normalizeOwner(task.assignee) === owner);
+    const listMarkup = ownerTasks.length
+      ? `<ul class="pm-list pm-task-list">${ownerTasks.map(renderTaskItem).join("")}</ul>`
+      : '<p class="pm-empty-state">No tasks yet.</p>';
+
+    return `
+      <article class="pm-task-column ${ownerClass}">
+        <h4>${escapeHtml(owner)} Tasks</h4>
+        ${listMarkup}
+      </article>
+    `;
+  }).join("");
 
   const activityMarkup = project.activity.length
     ? project.activity
@@ -824,7 +834,9 @@ function renderDetail() {
 
       <section class="pm-detail-section pm-task-section">
         <h3>Tasks</h3>
-        <ul class="pm-list pm-task-list">${taskMarkup}</ul>
+        <div class="pm-task-columns">
+          ${taskColumnsMarkup}
+        </div>
         <form id="newTaskForm" class="pm-task-form">
           <label>
             Task Title
