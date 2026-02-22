@@ -112,6 +112,14 @@ button.rt-ghost:hover,
   letter-spacing: 0.01em;
 }
 
+.eyebrow,
+.pm-eyebrow,
+.sp-eyebrow,
+.rt-eyebrow,
+.launcher-eyebrow {
+  letter-spacing: 0.09em;
+}
+
 /* Better visual grouping in dense detail forms. */
 .client-form,
 .pm-form,
@@ -120,6 +128,79 @@ button.rt-ghost:hover,
 .pm-detail-grid,
 .sp-detail-grid {
   row-gap: var(--ui-space-3);
+}
+
+.metric-grid article,
+.pm-metric-grid article,
+.sp-metric-grid article {
+  border-radius: var(--ui-radius-md);
+}
+
+.board,
+.pm-board,
+.sp-board {
+  gap: var(--ui-space-3);
+}
+
+.column,
+.pm-column,
+.sp-column {
+  border-radius: var(--ui-radius-lg);
+}
+
+.column-head,
+.pm-column-head,
+.sp-column-head {
+  border-top-left-radius: var(--ui-radius-md);
+  border-top-right-radius: var(--ui-radius-md);
+}
+
+.column-dropzone,
+.pm-dropzone,
+.sp-dropzone {
+  min-height: 200px;
+  padding: 10px;
+  border-bottom-left-radius: var(--ui-radius-md);
+  border-bottom-right-radius: var(--ui-radius-md);
+}
+
+.card,
+.pm-card,
+.sp-card {
+  border-radius: var(--ui-radius-md);
+}
+
+.card:hover,
+.pm-card:hover,
+.sp-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(18, 31, 25, 0.12);
+}
+
+.card.is-dragging,
+.pm-card.is-dragging,
+.sp-card.is-dragging {
+  transform: none;
+}
+
+.detail-wrap,
+.pm-detail-wrap,
+.sp-detail-wrap {
+  gap: 14px;
+}
+
+.detail-section,
+.pm-detail-section,
+.sp-detail-section {
+  border-radius: var(--ui-radius-md);
+}
+
+.rt-list {
+  gap: 12px;
+}
+
+.rt-item {
+  padding: 12px;
 }
 
 /* Improve keyboard discoverability on control clusters. */

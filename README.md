@@ -32,6 +32,19 @@ Then open:
 - http://localhost:8081/project-management.html (project management app)
 - http://localhost:8081/sprints.html (sprint planning + retro app)
 
+## Accessibility smoke check
+Run this from the repo root before pushing UI changes:
+
+```bash
+node scripts/a11y-smoke.mjs
+```
+
+What it checks:
+- Page-level metadata (`lang`, `title`, `viewport`)
+- Safe external links (`target="_blank"` with safe `rel`)
+- Button accessible naming
+- Basic form-control labeling heuristics
+
 ## Team sync setup (for shared data)
 If you want both partners to use the same live dataset:
 
@@ -59,11 +72,16 @@ Both app modules use the same sync service with app isolation:
 - `/sprints.html`: two-week sprint planning + retro app UI
 - `/launcher.css`: launcher page styling
 - `/styles.css`: styling and responsive layout
+- `/ui-tokens.css`: shared design tokens and interaction primitives
+- `/ui-components.css`: shared component-level visual polish
 - `/app.js`: app logic (state, kanban, tasks, notes, local storage, team sync)
 - `/project-management.css`: project management styling
 - `/project-management.js`: project management logic
 - `/sprints.css`: sprint app styling
 - `/sprints.js`: sprint app logic
+- `/scripts/a11y-smoke.mjs`: lightweight accessibility smoke checks for local pages
+- `/UIUX_AUDIT_PHASE1.md`: UI audit + scorecard
+- `/ACCESSIBILITY_MATRIX_PHASE2.md`: accessibility matrix baseline
 - `/api/*`: Render-ready API
 - `/supabase/schema.sql`: DB bootstrap
 - `/render.yaml`: optional Render blueprint

@@ -19,50 +19,64 @@
         <p>Select a workspace to continue.</p>
       </header>
 
-      <section class="launcher-grid" aria-label="Application launcher">
-        <a class="app-badge app-badge-live" href="/sprints.html">
-          <span class="app-kicker">Live</span>
-          <strong>Sprints</strong>
-          <small>Two-week sprint planning, owner goals, and retro visibility.</small>
-        </a>
+      <section class="launcher-section" aria-label="Core workspace apps">
+        <div class="launcher-section-head">
+          <h2>Core Workspace Apps</h2>
+          <p>Primary planning, delivery, and coordination tools for daily execution.</p>
+        </div>
+        <div class="launcher-grid">
+          <a class="app-badge app-badge-live" href="/sprints.html">
+            <span class="app-kicker">Live</span>
+            <strong>Sprints</strong>
+            <small>Two-week sprint planning, owner goals, and retro visibility.</small>
+          </a>
 
-        <a class="app-badge app-badge-live" href="/onboarding.html">
-          <span class="app-kicker">Live</span>
-          <strong>Client Onboarding and Fulfillment</strong>
-          <small>Open the active onboarding + delivery workflow app.</small>
-        </a>
+          <a class="app-badge app-badge-live" href="/onboarding.html">
+            <span class="app-kicker">Live</span>
+            <strong>Client Onboarding and Fulfillment</strong>
+            <small>Open the active onboarding + delivery workflow app.</small>
+          </a>
 
-        <a class="app-badge app-badge-live app-badge-live-alt" href="/project-management.html">
-          <span class="app-kicker">Live</span>
-          <strong>Project Management</strong>
-          <small>Cross-project tracking with milestones, blockers, and ownership.</small>
-        </a>
+          <a class="app-badge app-badge-live app-badge-live-alt" href="/project-management.html">
+            <span class="app-kicker">Live</span>
+            <strong>Project Management</strong>
+            <small>Cross-project tracking with milestones, blockers, and ownership.</small>
+          </a>
 
-        <a class="app-badge app-badge-live app-badge-sync" href="/realtime-sync.html">
-          <span class="app-kicker">Live</span>
-          <strong>Realtime Sync</strong>
-          <small>High-signal Loom + summary handoffs with required acknowledgement notes.</small>
-          <span id="realtimeSyncBadge" class="app-counter is-hidden" aria-live="polite" aria-label="Outstanding realtime sync items">
-            0
-          </span>
-        </a>
+          <a class="app-badge app-badge-live app-badge-sync" href="/realtime-sync.html">
+            <span class="app-kicker">Live</span>
+            <strong>Realtime Sync</strong>
+            <small>High-signal Loom + summary handoffs with required acknowledgement notes.</small>
+            <span id="realtimeSyncBadge" class="app-counter is-hidden" aria-live="polite" aria-label="Outstanding realtime sync items">
+              0
+            </span>
+          </a>
+        </div>
+      </section>
 
-        <a
-          class="app-badge app-badge-live app-badge-finance"
-          href="https://private-business-finance-os.vercel.app/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="app-kicker">External</span>
-          <strong>Business Finance OS</strong>
-          <small>Open the finance operations app in a new tab.</small>
-        </a>
+      <section class="launcher-section" aria-label="External apps">
+        <div class="launcher-section-head">
+          <h2>External Apps</h2>
+          <p>Connected tools managed in separate repositories.</p>
+        </div>
+        <div class="launcher-grid launcher-grid-external">
+          <a
+            class="app-badge app-badge-live app-badge-finance"
+            href="https://private-business-finance-os.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="app-kicker">External</span>
+            <strong>Business Finance OS</strong>
+            <small>Open the finance operations app in a new tab.</small>
+          </a>
 
-        <a class="app-badge app-badge-live" href="https://internal.awe2m8.ai/login" target="_blank" rel="noopener noreferrer">
-          <span class="app-kicker">External</span>
-          <strong>Internal Ops Portal</strong>
-          <small>Open internal operations tools in a new tab.</small>
-        </a>
+          <a class="app-badge app-badge-live" href="https://internal.awe2m8.ai/login" target="_blank" rel="noopener noreferrer">
+            <span class="app-kicker">External</span>
+            <strong>Internal Ops Portal</strong>
+            <small>Open internal operations tools in a new tab.</small>
+          </a>
+        </div>
       </section>
     </main>
 

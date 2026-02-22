@@ -49,10 +49,12 @@ body {
   max-width: 1040px;
   margin: 0 auto;
   padding: 40px 24px;
+  display: grid;
+  gap: 16px;
 }
 
 .launcher-head {
-  margin-bottom: 18px;
+  margin-bottom: 4px;
 }
 
 .launcher-eyebrow {
@@ -80,6 +82,31 @@ body {
   gap: 14px;
 }
 
+.launcher-section {
+  border: 1px solid rgba(212, 219, 211, 0.85);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 250, 247, 0.85));
+  box-shadow: 0 10px 24px rgba(27, 37, 32, 0.07);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.launcher-section-head h2 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.launcher-section-head p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.launcher-grid-external {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .app-badge {
   text-align: left;
   border: 1px solid var(--line);
@@ -87,6 +114,7 @@ body {
   background: var(--panel);
   box-shadow: var(--shadow);
   padding: 16px;
+  min-height: 136px;
   color: var(--ink);
   text-decoration: none;
   display: grid;
@@ -134,6 +162,12 @@ body {
   box-shadow: 0 18px 34px rgba(11, 122, 99, 0.16);
 }
 
+.launcher-grid-external .app-kicker {
+  border-color: #d5c9e8;
+  background: #faf6ff;
+  color: #553a82;
+}
+
 .app-badge-sync {
   position: relative;
 }
@@ -167,5 +201,13 @@ body {
 
   .launcher-grid {
     grid-template-columns: 1fr;
+  }
+
+  .launcher-grid-external {
+    grid-template-columns: 1fr;
+  }
+
+  .app-badge {
+    min-height: 0;
   }
 }
