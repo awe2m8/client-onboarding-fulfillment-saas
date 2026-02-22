@@ -515,7 +515,7 @@ button.sp-danger {
 
 .sp-goal-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(132px, auto) auto;
   gap: 8px;
   align-items: center;
 }
@@ -532,14 +532,115 @@ button.sp-danger {
   overflow-wrap: anywhere;
 }
 
+.sp-status-chip {
+  border-radius: 999px;
+  border: 1px solid #c9d7cf;
+  background: #f4f8f6;
+  color: #2f5849;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  width: fit-content;
+}
+
+.sp-status-todo {
+  border-color: #c9d7cf;
+  background: #f4f8f6;
+  color: #2f5849;
+}
+
+.sp-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+  color: #8f5415;
+}
+
+.sp-status-done {
+  border-color: #9fd0b4;
+  background: #e9f7ef;
+  color: #1f6b4e;
+}
+
 .sp-goal-status {
-  min-width: 128px;
+  min-width: 132px;
+}
+
+select.sp-goal-status.sp-status-todo {
+  border-color: #c9d7cf;
+  background: #f6fbf8;
+  color: #2f5849;
+}
+
+select.sp-goal-status.sp-status-in-progress {
+  border-color: #e5c28a;
+  background: #fff4df;
+  color: #8f5415;
+}
+
+select.sp-goal-status.sp-status-done {
+  border-color: #9fd0b4;
+  background: #ebf7f0;
+  color: #1f6b4e;
 }
 
 .sp-goal-meta {
   margin: 5px 0 0;
   color: #7a8780;
   font-size: 0.78rem;
+}
+
+.sp-subtask-details {
+  margin-top: 8px;
+  border: 1px solid #e5ebe4;
+  border-radius: 10px;
+  background: #fafcfb;
+}
+
+.sp-subtask-details summary {
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2a4f41;
+  user-select: none;
+}
+
+.sp-subtask-details[open] summary {
+  border-bottom: 1px solid #e5ebe4;
+}
+
+.sp-subtask-panel {
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.sp-subtask-form {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(132px, auto) auto;
+}
+
+.sp-subtask-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.sp-subtask-item {
+  border: 1px solid #e3e9e2;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+}
+
+.sp-subtask-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(132px, auto) auto;
+  gap: 8px;
+  align-items: center;
 }
 
 .sp-empty-state {
@@ -587,6 +688,14 @@ button.sp-danger {
   }
 
   .sp-goal-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-subtask-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-subtask-form {
     grid-template-columns: 1fr;
   }
 

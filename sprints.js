@@ -526,19 +526,46 @@ function handleDetailSubmit(event) {
       return;
     }
 
-    const status = normalizeGoalStatus(formData.get("status"));
-    const goal = {
-      id: uid("goal"),
-      owner: normalizeGoalOwner(formData.get("owner")),
+    const goal = buildGoal(
+      formData.get("owner"),
       title,
-      status,
-      done: status === "done",
-      createdAt: isoNow(),
-      updatedAt: isoNow()
-    };
+      formData.get("status"),
+      isoNow()
+    );
 
     sprint.goals.unshift(goal);
     touchSprint(sprint, `Goal added (${goal.owner}): ${goal.title}`);
+
+    form.reset();
+    persistSnapshot();
+    render();
+    return;
+  }
+
+  if (form.dataset.form === "add-subtask") {
+    const goalId = String(form.dataset.goalId || "").trim();
+    const goal = sprint.goals.find((item) => item.id === goalId);
+    if (!goal) {
+      return;
+    }
+
+    const formData = new FormData(form);
+    const title = String(formData.get("title") || "").trim();
+    if (!title) {
+      return;
+    }
+
+    const now = isoNow();
+    const subtask = buildSubtask(title, formData.get("status"), now);
+
+    if (!Array.isArray(goal.subtasks)) {
+      goal.subtasks = [];
+    }
+
+    goal.subtasks.unshift(subtask);
+    goal.updatedAt = now;
+
+    touchSprint(sprint, `Sub-task added (${goal.owner}): ${subtask.title}`);
 
     form.reset();
     persistSnapshot();
@@ -579,6 +606,43 @@ function handleDetailChange(event) {
     touchSprint(sprint, `Updated goal status (${goal.owner}): ${goal.title}`);
     persistSnapshot();
     render();
+    return;
+  }
+
+  if (action === "subtask-toggle") {
+    const subtask = (goal.subtasks || []).find((item) => item.id === event.target.dataset.subtaskId);
+    if (!subtask) {
+      return;
+    }
+
+    subtask.done = Boolean(event.target.checked);
+    subtask.status = subtask.done ? "done" : "todo";
+    subtask.updatedAt = isoNow();
+    goal.updatedAt = subtask.updatedAt;
+
+    touchSprint(
+      sprint,
+      `${subtask.done ? "Completed" : "Reopened"} sub-task (${goal.owner}): ${subtask.title}`
+    );
+    persistSnapshot();
+    render();
+    return;
+  }
+
+  if (action === "subtask-status") {
+    const subtask = (goal.subtasks || []).find((item) => item.id === event.target.dataset.subtaskId);
+    if (!subtask) {
+      return;
+    }
+
+    subtask.status = normalizeGoalStatus(event.target.value);
+    subtask.done = subtask.status === "done";
+    subtask.updatedAt = isoNow();
+    goal.updatedAt = subtask.updatedAt;
+
+    touchSprint(sprint, `Updated sub-task status (${goal.owner}): ${subtask.title}`);
+    persistSnapshot();
+    render();
   }
 }
 
@@ -614,6 +678,27 @@ function handleDetailClick(event) {
 
     sprint.goals = sprint.goals.filter((item) => item.id !== goalId);
     touchSprint(sprint, `Removed goal (${goal ? goal.owner : "Owner"}): ${goal ? goal.title : "Goal"}`);
+    persistSnapshot();
+    render();
+    return;
+  }
+
+  if (action === "subtask-delete") {
+    const goalId = String(actionEl.dataset.goalId || "").trim();
+    const subtaskId = String(actionEl.dataset.subtaskId || "").trim();
+    const goal = sprint.goals.find((item) => item.id === goalId);
+    if (!goal) {
+      return;
+    }
+
+    const subtask = (goal.subtasks || []).find((item) => item.id === subtaskId);
+    goal.subtasks = (goal.subtasks || []).filter((item) => item.id !== subtaskId);
+    goal.updatedAt = isoNow();
+
+    touchSprint(
+      sprint,
+      `Removed sub-task (${goal.owner}): ${subtask ? subtask.title : "Sub-task"}`
+    );
     persistSnapshot();
     render();
   }
@@ -800,7 +885,7 @@ function renderDetail() {
           </label>
           <label>
             Status
-            <select name="status">
+            <select name="status" class="sp-goal-status ${statusClass("todo")}">
               ${optionMarkup(GOAL_STATUS_OPTIONS, "todo")}
             </select>
           </label>
@@ -821,6 +906,15 @@ function renderDetail() {
 }
 
 function renderGoalItem(goal) {
+  const subtasks = Array.isArray(goal.subtasks) ? goal.subtasks : [];
+  const completedSubtasks = subtasks.filter((item) => item.done).length;
+  const status = normalizeGoalStatus(goal.status);
+  const statusLabel = goalStatusLabel(status);
+  const statusToneClass = statusClass(status);
+  const subtaskListMarkup = subtasks.length
+    ? `<ul class="sp-subtask-list">${subtasks.map((item) => renderSubtaskItem(goal, item)).join("")}</ul>`
+    : '<p class="sp-empty-state">No sub-tasks yet.</p>';
+
   return `
     <li class="sp-list-item">
       <div class="sp-goal-row">
@@ -828,12 +922,67 @@ function renderGoalItem(goal) {
           <input type="checkbox" data-action="goal-toggle" data-goal-id="${goal.id}" ${goal.done ? "checked" : ""} />
           <span>${escapeHtml(goal.title)}</span>
         </label>
-        <select class="sp-goal-status" data-action="goal-status" data-goal-id="${goal.id}">
+        <span class="sp-status-chip ${statusToneClass}">${escapeHtml(statusLabel)}</span>
+        <select class="sp-goal-status ${statusToneClass}" data-action="goal-status" data-goal-id="${goal.id}">
           ${optionMarkup(GOAL_STATUS_OPTIONS, goal.status)}
         </select>
         <button class="sp-ghost" type="button" data-action="goal-delete" data-goal-id="${goal.id}">Delete</button>
       </div>
       <p class="sp-goal-meta">Updated ${escapeHtml(timeAgo(goal.updatedAt))}</p>
+      <details class="sp-subtask-details">
+        <summary>Sub-tasks (${completedSubtasks}/${subtasks.length})</summary>
+        <div class="sp-subtask-panel">
+          <form class="sp-subtask-form" data-form="add-subtask" data-goal-id="${goal.id}">
+            <input name="title" placeholder="Add a sub-task" required />
+            <select name="status" class="sp-goal-status ${statusClass("todo")}">
+              ${optionMarkup(GOAL_STATUS_OPTIONS, "todo")}
+            </select>
+            <button type="submit">Add</button>
+          </form>
+          ${subtaskListMarkup}
+        </div>
+      </details>
+    </li>
+  `;
+}
+
+function renderSubtaskItem(goal, subtask) {
+  const status = normalizeGoalStatus(subtask.status);
+  const statusToneClass = statusClass(status);
+
+  return `
+    <li class="sp-subtask-item">
+      <div class="sp-subtask-row">
+        <label class="sp-goal-check">
+          <input
+            type="checkbox"
+            data-action="subtask-toggle"
+            data-goal-id="${goal.id}"
+            data-subtask-id="${subtask.id}"
+            ${subtask.done ? "checked" : ""}
+          />
+          <span>${escapeHtml(subtask.title)}</span>
+        </label>
+        <span class="sp-status-chip ${statusToneClass}">${escapeHtml(goalStatusLabel(status))}</span>
+        <select
+          class="sp-goal-status ${statusToneClass}"
+          data-action="subtask-status"
+          data-goal-id="${goal.id}"
+          data-subtask-id="${subtask.id}"
+        >
+          ${optionMarkup(GOAL_STATUS_OPTIONS, status)}
+        </select>
+        <button
+          class="sp-ghost"
+          type="button"
+          data-action="subtask-delete"
+          data-goal-id="${goal.id}"
+          data-subtask-id="${subtask.id}"
+        >
+          Delete
+        </button>
+      </div>
+      <p class="sp-goal-meta">Updated ${escapeHtml(timeAgo(subtask.updatedAt))}</p>
     </li>
   `;
 }
@@ -871,6 +1020,20 @@ function buildGoal(owner, title, status, createdAt) {
   return {
     id: uid("goal"),
     owner: normalizedOwner,
+    title: String(title || "").trim(),
+    status: normalizedStatus,
+    done: normalizedStatus === "done",
+    subtasks: [],
+    createdAt,
+    updatedAt: createdAt
+  };
+}
+
+function buildSubtask(title, status, createdAt) {
+  const normalizedStatus = normalizeGoalStatus(status);
+
+  return {
+    id: uid("subtask"),
     title: String(title || "").trim(),
     status: normalizedStatus,
     done: normalizedStatus === "done",
@@ -1292,20 +1455,46 @@ function sanitizeGoals(input) {
         return null;
       }
 
-      const status = normalizeGoalStatus(item.status);
+      const status = normalizeGoalStatus(item.status || (item.done ? "done" : "todo"));
 
       return {
         id,
         owner: normalizeGoalOwner(item.owner),
         title: String(item.title || "").trim(),
         status,
-        done: Boolean(item.done || status === "done"),
+        done: status === "done",
+        subtasks: sanitizeSubtasks(item.subtasks),
         createdAt: normalizeTimestamp(item.createdAt || isoNow()),
         updatedAt: normalizeTimestamp(item.updatedAt || item.createdAt || isoNow())
       };
     })
     .filter((item) => item && item.title)
     .slice(0, 1000);
+}
+
+function sanitizeSubtasks(input) {
+  const subtasks = Array.isArray(input) ? input : [];
+
+  return subtasks
+    .map((item) => {
+      const id = String(item?.id || "").trim();
+      if (!id) {
+        return null;
+      }
+
+      const status = normalizeGoalStatus(item.status || (item.done ? "done" : "todo"));
+
+      return {
+        id,
+        title: String(item.title || "").trim(),
+        status,
+        done: status === "done",
+        createdAt: normalizeTimestamp(item.createdAt || isoNow()),
+        updatedAt: normalizeTimestamp(item.updatedAt || item.createdAt || isoNow())
+      };
+    })
+    .filter((item) => item && item.title)
+    .slice(0, 400);
 }
 
 function sanitizeRetro(input) {
@@ -1347,6 +1536,21 @@ function normalizeGoalStatus(value) {
   const allowed = new Set(GOAL_STATUS_OPTIONS.map((option) => option.value));
   const normalized = String(value || "").trim();
   return allowed.has(normalized) ? normalized : "todo";
+}
+
+function goalStatusLabel(value) {
+  return GOAL_STATUS_OPTIONS.find((option) => option.value === normalizeGoalStatus(value))?.label || "To Do";
+}
+
+function statusClass(value) {
+  const status = normalizeGoalStatus(value);
+  if (status === "done") {
+    return "sp-status-done";
+  }
+  if (status === "in-progress") {
+    return "sp-status-in-progress";
+  }
+  return "sp-status-todo";
 }
 
 function normalizeGoalOwner(value) {
