@@ -675,9 +675,9 @@ button.sp-danger {
 }
 
 .sp-status-todo {
-  border-color: #c9d7cf;
-  background: #f4f8f6;
-  color: #2f5849;
+  border-color: #efbcbc;
+  background: #fbecec;
+  color: #8a2222;
 }
 
 .sp-status-in-progress {
@@ -697,9 +697,9 @@ button.sp-danger {
 }
 
 select.sp-goal-status.sp-status-todo {
-  border-color: #c9d7cf;
-  background: #f6fbf8;
-  color: #2f5849;
+  border-color: #efbcbc;
+  background: #fbecec;
+  color: #8a2222;
 }
 
 select.sp-goal-status.sp-status-in-progress {
