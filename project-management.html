@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project Management</title>
+    <link rel="stylesheet" href="project-management.css" />
+  </head>
+  <body>
+    <div class="pm-glow pm-glow-left" aria-hidden="true"></div>
+    <div class="pm-glow pm-glow-right" aria-hidden="true"></div>
+
+    <header class="pm-header">
+      <div>
+        <p class="pm-eyebrow">Workspace App</p>
+        <h1>Project Management</h1>
+        <p>Run multiple client projects with clear stages, ownership, and delivery tasks.</p>
+      </div>
+      <nav class="pm-nav" aria-label="App navigation">
+        <a class="pm-link" href="/">App Launcher</a>
+        <a class="pm-link" href="/onboarding.html">Onboarding App</a>
+      </nav>
+    </header>
+
+    <main class="pm-shell">
+      <section class="pm-panel pm-intake-panel">
+        <h2>Create Project</h2>
+        <form id="projectForm" class="pm-form">
+          <label>
+            Project Name
+            <input name="name" type="text" required placeholder="Website Revamp Q2" />
+          </label>
+          <label>
+            Client
+            <input name="client" type="text" placeholder="Northline Studio" />
+          </label>
+          <label>
+            Owner
+            <input name="owner" type="text" required placeholder="Jesse" />
+          </label>
+          <label>
+            Priority
+            <select name="priority">
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </label>
+          <label>
+            Due Date
+            <input name="dueDate" type="date" />
+          </label>
+          <label>
+            Start Stage
+            <select name="stageId">
+              <option value="backlog">Backlog</option>
+              <option value="planning">Planning</option>
+              <option value="in-progress">In Progress</option>
+              <option value="review">Review</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+          <label class="pm-form-span-2">
+            Notes
+            <textarea name="description" placeholder="Scope summary, dependencies, and key risks."></textarea>
+          </label>
+          <div class="pm-form-actions pm-form-span-2">
+            <button type="submit">Create Project</button>
+            <button id="seedProjectsBtn" type="button" class="pm-ghost">Load Demo Projects</button>
+            <button id="clearProjectsBtn" type="button" class="pm-danger">Clear All Projects</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="pm-panel pm-metrics-panel">
+        <h2>Project Snapshot</h2>
+        <div class="pm-metric-grid">
+          <article><span id="metricTotalProjects">0</span><small>Total Projects</small></article>
+          <article><span id="metricActiveProjects">0</span><small>Active</small></article>
+          <article><span id="metricBlockedProjects">0</span><small>Blocked</small></article>
+          <article><span id="metricCompletedProjects">0</span><small>Completed</small></article>
+          <article><span id="metricOverdueProjects">0</span><small>Overdue</small></article>
+          <article><span id="metricOpenTasks">0</span><small>Open Tasks</small></article>
+        </div>
+      </section>
+
+      <section class="pm-panel pm-filter-panel">
+        <h2>Filters</h2>
+        <div class="pm-filters">
+          <label>
+            Search
+            <input id="searchInput" type="text" placeholder="project, client, owner" />
+          </label>
+          <label>
+            Owner
+            <select id="ownerFilter">
+              <option value="all">All</option>
+            </select>
+          </label>
+          <label>
+            Priority
+            <select id="priorityFilter">
+              <option value="all">All</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </label>
+          <label>
+            Blocked
+            <select id="blockedFilter">
+              <option value="all">All</option>
+              <option value="blocked">Blocked</option>
+              <option value="clear">Clear</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="pm-panel pm-board-panel">
+        <div class="pm-panel-head">
+          <h2>Project Kanban</h2>
+          <p>Drag cards between stages to update project flow.</p>
+        </div>
+        <div id="projectBoard" class="pm-board"></div>
+      </section>
+
+      <section class="pm-panel pm-detail-panel">
+        <h2>Project Detail</h2>
+        <div id="projectDetail" class="pm-detail-empty">
+          Select a project card to manage project details, tasks, and activity.
+        </div>
+      </section>
+    </main>
+
+    <script src="project-management.js"></script>
+  </body>
+</html>

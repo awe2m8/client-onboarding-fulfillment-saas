@@ -122,6 +122,11 @@ body {
   background: linear-gradient(165deg, #ffffff, #f2faf7 70%, #edf8f3);
 }
 
+.app-badge-live-alt {
+  border-color: #9bc8e6;
+  background: linear-gradient(165deg, #ffffff, #f0f7fd 70%, #eaf3fb);
+}
+
 .app-badge-live:hover,
 .app-badge-live:focus-visible {
   transform: translateY(-2px);

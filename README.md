@@ -29,6 +29,7 @@ python3 -m http.server 8081
 Then open:
 - http://localhost:8081
 - http://localhost:8081/onboarding.html (direct onboarding app)
+- http://localhost:8081/project-management.html (project management app)
 
 ## Team sync setup (for shared data)
 If you want both partners to use the same live dataset:
@@ -47,9 +48,12 @@ If you want both partners to use the same live dataset:
 ## Files
 - `/index.html`: launcher page with app badges
 - `/onboarding.html`: onboarding + fulfillment app UI
+- `/project-management.html`: project management app UI
 - `/launcher.css`: launcher page styling
 - `/styles.css`: styling and responsive layout
 - `/app.js`: app logic (state, kanban, tasks, notes, local storage, team sync)
+- `/project-management.css`: project management styling
+- `/project-management.js`: project management logic
 - `/api/*`: Render-ready API
 - `/supabase/schema.sql`: DB bootstrap
 - `/render.yaml`: optional Render blueprint
