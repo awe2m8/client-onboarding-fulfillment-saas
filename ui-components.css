@@ -1,0 +1,147 @@
+:root {
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 20px;
+  --ui-space-6: 24px;
+
+  --ui-text-sm: 0.88rem;
+  --ui-text-base: 1rem;
+  --ui-text-lg: 1.12rem;
+  --ui-text-xl: 1.25rem;
+}
+
+body {
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app-header h1,
+.pm-header h1,
+.sp-header h1,
+.rt-header h1,
+.launcher-head h1 {
+  line-height: 1.15;
+}
+
+.subtitle,
+.pm-header p,
+.sp-header p,
+.rt-header p,
+.launcher-head p {
+  max-width: 72ch;
+}
+
+.panel,
+.pm-panel,
+.sp-panel,
+.rt-panel {
+  border-radius: var(--ui-radius-lg);
+  box-shadow: 0 1px 0 rgba(20, 33, 27, 0.04), 0 10px 22px rgba(20, 33, 27, 0.05);
+}
+
+.panel h2,
+.pm-panel h2,
+.sp-panel h2,
+.rt-panel-head h2 {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.panel-note,
+.pm-panel-note,
+.sp-panel-note {
+  font-size: var(--ui-text-sm);
+}
+
+.panel-head p,
+.pm-panel-head p,
+.sp-panel-head p,
+.rt-panel-head p {
+  font-size: var(--ui-text-sm);
+  line-height: 1.45;
+}
+
+button,
+.app-badge,
+.pm-card,
+.sp-card,
+.rt-item {
+  transition: transform var(--ui-transition-fast), border-color var(--ui-transition-fast),
+    box-shadow var(--ui-transition-fast), background var(--ui-transition-fast), color var(--ui-transition-fast);
+}
+
+.app-badge,
+.pm-card,
+.sp-card,
+.rt-item {
+  border-radius: var(--ui-radius-lg);
+}
+
+.app-badge:focus-visible {
+  border-color: var(--brand, var(--ui-color-brand));
+}
+
+button.ghost,
+button.pm-ghost,
+button.sp-ghost,
+button.rt-ghost,
+.link-button.ghost {
+  background: #fff;
+  border-color: var(--line, var(--pm-line, var(--rt-line, var(--ui-color-border))));
+  color: var(--ink, var(--pm-ink, var(--rt-ink, var(--ui-color-text))));
+}
+
+button.ghost:hover,
+button.pm-ghost:hover,
+button.sp-ghost:hover,
+button.rt-ghost:hover,
+.link-button.ghost:hover {
+  border-color: var(--brand, var(--pm-brand, var(--rt-brand, var(--ui-color-brand))));
+  color: var(--brand, var(--pm-brand, var(--rt-brand, var(--ui-color-brand))));
+}
+
+.app-kicker,
+.pm-badge,
+.sp-badge,
+.pm-status-chip,
+.sp-status-chip,
+.pm-task-owner-chip {
+  letter-spacing: 0.01em;
+}
+
+/* Better visual grouping in dense detail forms. */
+.client-form,
+.pm-form,
+.sp-form,
+.rt-form,
+.pm-detail-grid,
+.sp-detail-grid {
+  row-gap: var(--ui-space-3);
+}
+
+/* Improve keyboard discoverability on control clusters. */
+.form-actions button:focus-visible,
+.pm-form-actions button:focus-visible,
+.sp-form-actions button:focus-visible,
+.rt-form-actions button:focus-visible {
+  box-shadow: var(--ui-focus-ring);
+}
+
+@media (max-width: 780px) {
+  .app-header,
+  .pm-header,
+  .sp-header,
+  .rt-header {
+    gap: var(--ui-space-3);
+  }
+
+  .panel,
+  .pm-panel,
+  .sp-panel,
+  .rt-panel {
+    padding: var(--ui-space-3);
+  }
+}
