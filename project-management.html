@@ -30,13 +30,13 @@
             id="pmTopToggleBtn"
             class="pm-panel-toggle-btn"
             type="button"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-controls="pmTopContent"
           >
             <span class="pm-panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="pmTopContent" class="pm-collapsible-content">
+        <div id="pmTopContent" class="pm-collapsible-content is-collapsed">
           <div class="pm-top-grid">
             <section class="pm-subpanel">
               <h3>Create Project</h3>
@@ -110,13 +110,13 @@
             id="pmSyncToggleBtn"
             class="pm-panel-toggle-btn"
             type="button"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-controls="pmSyncContent"
           >
             <span class="pm-panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="pmSyncContent" class="pm-collapsible-content">
+        <div id="pmSyncContent" class="pm-collapsible-content is-collapsed">
           <div class="pm-sync-grid">
             <label>
               API URL
@@ -139,51 +139,88 @@
       </section>
 
       <section class="pm-panel pm-filter-panel">
-        <h2>Filters</h2>
-        <div class="pm-filters">
-          <label>
-            Search
-            <input id="searchInput" type="text" placeholder="project, client, owner" />
-          </label>
-          <label>
-            Owner
-            <select id="ownerFilter">
-              <option value="all">All</option>
-            </select>
-          </label>
-          <label>
-            Priority
-            <select id="priorityFilter">
-              <option value="all">All</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="critical">Critical</option>
-            </select>
-          </label>
-          <label>
-            Blocked
-            <select id="blockedFilter">
-              <option value="all">All</option>
-              <option value="blocked">Blocked</option>
-              <option value="clear">Clear</option>
-            </select>
-          </label>
+        <div class="pm-panel-collapse-head">
+          <h2>Filters</h2>
+          <button
+            id="pmFiltersToggleBtn"
+            class="pm-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="pmFiltersContent"
+          >
+            <span class="pm-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="pmFiltersContent" class="pm-collapsible-content is-collapsed">
+          <div class="pm-filters">
+            <label>
+              Search
+              <input id="searchInput" type="text" placeholder="project, client, owner" />
+            </label>
+            <label>
+              Owner
+              <select id="ownerFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              Priority
+              <select id="priorityFilter">
+                <option value="all">All</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </label>
+            <label>
+              Blocked
+              <select id="blockedFilter">
+                <option value="all">All</option>
+                <option value="blocked">Blocked</option>
+                <option value="clear">Clear</option>
+              </select>
+            </label>
+          </div>
         </div>
       </section>
 
       <section class="pm-panel pm-board-panel">
-        <div class="pm-panel-head">
-          <h2>Project Kanban</h2>
-          <p>Drag cards between stages to update project flow.</p>
+        <div class="pm-panel-collapse-head">
+          <h2>Project Plan</h2>
+          <button
+            id="pmBoardToggleBtn"
+            class="pm-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="pmBoardContent"
+          >
+            <span class="pm-panel-toggle-icon">▾</span>
+          </button>
         </div>
-        <div id="projectBoard" class="pm-board"></div>
+        <div id="pmBoardContent" class="pm-collapsible-content is-collapsed">
+          <p class="pm-panel-note">Drag cards between stages to update project flow.</p>
+          <div id="projectBoard" class="pm-board"></div>
+        </div>
       </section>
 
       <section class="pm-panel pm-detail-panel">
-        <h2>Project Detail</h2>
-        <div id="projectDetail" class="pm-detail-empty">
-          Select a project card to manage project details, tasks, and activity.
+        <div class="pm-panel-collapse-head">
+          <h2>Project Details</h2>
+          <button
+            id="pmDetailToggleBtn"
+            class="pm-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="pmDetailContent"
+          >
+            <span class="pm-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="pmDetailContent" class="pm-collapsible-content is-collapsed">
+          <div id="projectDetail" class="pm-detail-empty">
+            Select a project card to manage project details, tasks, and activity.
+          </div>
         </div>
       </section>
     </main>

@@ -49,6 +49,12 @@ const els = {
   clearSprintsBtn: document.getElementById("clearSprintsBtn"),
   sprintTopToggleBtn: document.getElementById("sprintTopToggleBtn"),
   sprintTopContent: document.getElementById("sprintTopContent"),
+  sprintSyncToggleBtn: document.getElementById("sprintSyncToggleBtn"),
+  sprintSyncContent: document.getElementById("sprintSyncContent"),
+  sprintBoardToggleBtn: document.getElementById("sprintBoardToggleBtn"),
+  sprintBoardContent: document.getElementById("sprintBoardContent"),
+  sprintDetailToggleBtn: document.getElementById("sprintDetailToggleBtn"),
+  sprintDetailContent: document.getElementById("sprintDetailContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -100,11 +106,26 @@ function bindEvents() {
   els.seedSprintsBtn.addEventListener("click", seedDemoSprint);
   els.clearSprintsBtn.addEventListener("click", clearAllSprints);
   els.startDateInput.addEventListener("change", autofillCreateEndDate);
-  if (els.sprintTopToggleBtn && els.sprintTopContent) {
-    els.sprintTopToggleBtn.addEventListener("click", () => {
-      togglePanelSection(els.sprintTopToggleBtn, els.sprintTopContent);
+
+  const panelToggles = [
+    ["sprintTopToggleBtn", "sprintTopContent"],
+    ["sprintSyncToggleBtn", "sprintSyncContent"],
+    ["sprintBoardToggleBtn", "sprintBoardContent"],
+    ["sprintDetailToggleBtn", "sprintDetailContent"]
+  ];
+
+  panelToggles.forEach(([toggleKey, contentKey]) => {
+    const toggleBtn = els[toggleKey];
+    const contentEl = els[contentKey];
+
+    if (!toggleBtn || !contentEl) {
+      return;
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      togglePanelSection(toggleBtn, contentEl);
     });
-  }
+  });
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {
@@ -913,8 +934,12 @@ function renderDetail() {
       </section>
 
       <section class="sp-detail-section">
-        <h3>Sprint Activity</h3>
-        ${activityMarkup}
+        <details class="sp-activity-details">
+          <summary>Sprint Activity</summary>
+          <div class="sp-activity-content">
+            ${activityMarkup}
+          </div>
+        </details>
       </section>
     </div>
   `;

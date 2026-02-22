@@ -31,13 +31,13 @@
             id="sprintTopToggleBtn"
             class="sp-panel-toggle-btn"
             type="button"
-            aria-expanded="true"
+            aria-expanded="false"
             aria-controls="sprintTopContent"
           >
             <span class="sp-panel-toggle-icon">▾</span>
           </button>
         </div>
-        <div id="sprintTopContent" class="sp-collapsible-content">
+        <div id="sprintTopContent" class="sp-collapsible-content is-collapsed">
           <div class="sp-top-grid">
             <section class="sp-subpanel">
               <h3>Create Sprint</h3>
@@ -92,39 +92,76 @@
       </section>
 
       <section class="sp-panel sp-sync-panel">
-        <h2>Team Sync</h2>
-        <div class="sp-sync-grid">
-          <label>
-            API URL
-            <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
-          </label>
-          <label>
-            Workspace Key
-            <input id="workspaceKeyInput" type="text" placeholder="allconvos-onboarding" />
-          </label>
-          <button id="saveSyncBtn" type="button" class="sp-ghost">Save Connection</button>
-          <button id="pullSharedBtn" type="button">Pull Shared Data</button>
-          <button id="pushSharedBtn" type="button" class="sp-ghost">Push Local Data</button>
-          <label class="sp-inline-toggle">
-            <input id="autoSyncCheckbox" type="checkbox" />
-            Auto sync (push on change + pull every 15s)
-          </label>
+        <div class="sp-panel-collapse-head">
+          <h2>Team Sync</h2>
+          <button
+            id="sprintSyncToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="sprintSyncContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
         </div>
-        <p id="syncStatus" class="sp-sync-status">Local only. Set API URL and workspace key to share data.</p>
+        <div id="sprintSyncContent" class="sp-collapsible-content is-collapsed">
+          <div class="sp-sync-grid">
+            <label>
+              API URL
+              <input id="apiUrlInput" type="url" placeholder="https://your-api.onrender.com" />
+            </label>
+            <label>
+              Workspace Key
+              <input id="workspaceKeyInput" type="text" placeholder="allconvos-onboarding" />
+            </label>
+            <button id="saveSyncBtn" type="button" class="sp-ghost">Save Connection</button>
+            <button id="pullSharedBtn" type="button">Pull Shared Data</button>
+            <button id="pushSharedBtn" type="button" class="sp-ghost">Push Local Data</button>
+            <label class="sp-inline-toggle">
+              <input id="autoSyncCheckbox" type="checkbox" />
+              Auto sync (push on change + pull every 15s)
+            </label>
+          </div>
+          <p id="syncStatus" class="sp-sync-status">Local only. Set API URL and workspace key to share data.</p>
+        </div>
       </section>
 
       <section class="sp-panel sp-board-panel">
-        <div class="sp-panel-head">
+        <div class="sp-panel-collapse-head">
           <h2>Sprint Board</h2>
-          <p>Drag sprint cards between stages as the block progresses.</p>
+          <button
+            id="sprintBoardToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="sprintBoardContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
         </div>
-        <div id="sprintBoard" class="sp-board"></div>
+        <div id="sprintBoardContent" class="sp-collapsible-content is-collapsed">
+          <p class="sp-panel-note">Drag sprint cards between stages as the block progresses.</p>
+          <div id="sprintBoard" class="sp-board"></div>
+        </div>
       </section>
 
       <section class="sp-panel sp-detail-panel">
-        <h2>Sprint Detail</h2>
-        <div id="sprintDetail" class="sp-detail-empty">
-          Select a sprint card to manage objectives, Jesse/Giles goals, and retro notes.
+        <div class="sp-panel-collapse-head">
+          <h2>Sprint Detail</h2>
+          <button
+            id="sprintDetailToggleBtn"
+            class="sp-panel-toggle-btn"
+            type="button"
+            aria-expanded="false"
+            aria-controls="sprintDetailContent"
+          >
+            <span class="sp-panel-toggle-icon">▾</span>
+          </button>
+        </div>
+        <div id="sprintDetailContent" class="sp-collapsible-content is-collapsed">
+          <div id="sprintDetail" class="sp-detail-empty">
+            Select a sprint card to manage objectives, Jesse/Giles goals, and retro notes.
+          </div>
         </div>
       </section>
     </main>

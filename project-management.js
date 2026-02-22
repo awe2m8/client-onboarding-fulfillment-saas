@@ -54,6 +54,12 @@ const els = {
   pmTopContent: document.getElementById("pmTopContent"),
   pmSyncToggleBtn: document.getElementById("pmSyncToggleBtn"),
   pmSyncContent: document.getElementById("pmSyncContent"),
+  pmFiltersToggleBtn: document.getElementById("pmFiltersToggleBtn"),
+  pmFiltersContent: document.getElementById("pmFiltersContent"),
+  pmBoardToggleBtn: document.getElementById("pmBoardToggleBtn"),
+  pmBoardContent: document.getElementById("pmBoardContent"),
+  pmDetailToggleBtn: document.getElementById("pmDetailToggleBtn"),
+  pmDetailContent: document.getElementById("pmDetailContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -104,16 +110,27 @@ function bindEvents() {
   els.projectForm.addEventListener("submit", handleCreateProject);
   els.seedProjectsBtn.addEventListener("click", seedDemoProjects);
   els.clearProjectsBtn.addEventListener("click", clearAllProjects);
-  if (els.pmTopToggleBtn && els.pmTopContent) {
-    els.pmTopToggleBtn.addEventListener("click", () => {
-      togglePanelSection(els.pmTopToggleBtn, els.pmTopContent);
+
+  const panelToggles = [
+    ["pmTopToggleBtn", "pmTopContent"],
+    ["pmSyncToggleBtn", "pmSyncContent"],
+    ["pmFiltersToggleBtn", "pmFiltersContent"],
+    ["pmBoardToggleBtn", "pmBoardContent"],
+    ["pmDetailToggleBtn", "pmDetailContent"]
+  ];
+
+  panelToggles.forEach(([toggleKey, contentKey]) => {
+    const toggleBtn = els[toggleKey];
+    const contentEl = els[contentKey];
+
+    if (!toggleBtn || !contentEl) {
+      return;
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      togglePanelSection(toggleBtn, contentEl);
     });
-  }
-  if (els.pmSyncToggleBtn && els.pmSyncContent) {
-    els.pmSyncToggleBtn.addEventListener("click", () => {
-      togglePanelSection(els.pmSyncToggleBtn, els.pmSyncContent);
-    });
-  }
+  });
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {

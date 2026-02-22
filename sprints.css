@@ -148,6 +148,12 @@ h1 {
   font-size: 0.9rem;
 }
 
+.sp-panel-note {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .sp-panel-collapse-head {
   display: flex;
   align-items: center;
@@ -712,6 +718,29 @@ select.sp-goal-status.sp-status-done {
   grid-template-columns: minmax(0, 1fr) auto minmax(132px, auto) auto;
   gap: 8px;
   align-items: center;
+}
+
+.sp-activity-details {
+  border: 1px solid #e5ebe4;
+  border-radius: 10px;
+  background: #fafcfb;
+}
+
+.sp-activity-details summary {
+  cursor: pointer;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2a4f41;
+  user-select: none;
+}
+
+.sp-activity-details[open] summary {
+  border-bottom: 1px solid #e5ebe4;
+}
+
+.sp-activity-content {
+  padding: 10px;
 }
 
 .sp-empty-state {

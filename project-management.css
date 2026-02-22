@@ -145,6 +145,12 @@ body {
   font-size: 0.9rem;
 }
 
+.pm-panel-note {
+  margin: 0 0 10px;
+  color: var(--pm-muted);
+  font-size: 0.9rem;
+}
+
 .pm-panel-collapse-head {
   display: flex;
   align-items: center;
