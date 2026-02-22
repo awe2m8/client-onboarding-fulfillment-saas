@@ -161,6 +161,15 @@ function togglePanelSection(toggleBtn, contentEl) {
   contentEl.classList.toggle("is-collapsed", !nextExpanded);
 }
 
+function setPanelExpanded(toggleBtn, contentEl, isExpanded) {
+  if (!toggleBtn || !contentEl) {
+    return;
+  }
+
+  toggleBtn.setAttribute("aria-expanded", String(Boolean(isExpanded)));
+  contentEl.classList.toggle("is-collapsed", !isExpanded);
+}
+
 function handleCreateSprint(event) {
   event.preventDefault();
   const formData = new FormData(event.currentTarget);
@@ -405,6 +414,7 @@ function handleBoardClick(event) {
   const action = actionEl.dataset.action;
   if (action === "open-sprint") {
     state.selectedSprintId = sprint.id;
+    setPanelExpanded(els.sprintDetailToggleBtn, els.sprintDetailContent, true);
     renderDetail();
     return;
   }
