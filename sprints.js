@@ -27,6 +27,7 @@ const state = {
   deletedRecords: [],
   selectedSprintId: null,
   dragSprintId: null,
+  dragGoalId: null,
   sync: {
     apiUrl: "",
     workspaceKey: "",
@@ -146,6 +147,10 @@ function bindEvents() {
   els.sprintDetail.addEventListener("submit", handleDetailSubmit);
   els.sprintDetail.addEventListener("change", handleDetailChange);
   els.sprintDetail.addEventListener("click", handleDetailClick);
+  els.sprintDetail.addEventListener("dragstart", handleGoalDragStart);
+  els.sprintDetail.addEventListener("dragover", handleGoalDragOver);
+  els.sprintDetail.addEventListener("drop", handleGoalDrop);
+  els.sprintDetail.addEventListener("dragend", handleGoalDragEnd);
 }
 
 function togglePanelSection(toggleBtn, contentEl) {
@@ -740,6 +745,188 @@ function handleDetailClick(event) {
   }
 }
 
+function handleGoalDragStart(event) {
+  const goalItem = event.target.closest(".sp-goal-item");
+  if (!goalItem) {
+    return;
+  }
+
+  state.dragGoalId = String(goalItem.dataset.goalId || "").trim();
+  if (!state.dragGoalId) {
+    return;
+  }
+
+  goalItem.classList.add("is-dragging");
+
+  if (event.dataTransfer) {
+    event.dataTransfer.setData("text/plain", state.dragGoalId);
+    event.dataTransfer.effectAllowed = "move";
+  }
+}
+
+function handleGoalDragOver(event) {
+  const goalList = event.target.closest(".sp-goal-list");
+  if (!goalList || !state.dragGoalId) {
+    return;
+  }
+
+  const sprint = getSelectedSprint();
+  if (!sprint) {
+    return;
+  }
+
+  const draggedGoal = sprint.goals.find((goal) => goal.id === state.dragGoalId);
+  if (!draggedGoal) {
+    return;
+  }
+
+  const listOwner = String(goalList.dataset.owner || "").trim();
+  if (!listOwner || draggedGoal.owner !== listOwner) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  clearGoalDropIndicators();
+
+  const beforeElement = goalItemAfterPointer(goalList, event.clientY);
+  if (beforeElement) {
+    beforeElement.classList.add("drop-before");
+  } else {
+    goalList.classList.add("drop-at-end");
+  }
+}
+
+function handleGoalDrop(event) {
+  const goalList = event.target.closest(".sp-goal-list");
+  if (!goalList || !state.dragGoalId) {
+    return;
+  }
+
+  const sprint = getSelectedSprint();
+  if (!sprint) {
+    clearGoalDragState();
+    return;
+  }
+
+  const draggedGoal = sprint.goals.find((goal) => goal.id === state.dragGoalId);
+  if (!draggedGoal) {
+    clearGoalDragState();
+    return;
+  }
+
+  const listOwner = String(goalList.dataset.owner || "").trim();
+  if (!listOwner || draggedGoal.owner !== listOwner) {
+    clearGoalDragState();
+    return;
+  }
+
+  event.preventDefault();
+
+  const beforeElement = goalItemAfterPointer(goalList, event.clientY);
+  const beforeGoalId = beforeElement ? String(beforeElement.dataset.goalId || "").trim() : "";
+  const didReorder = reorderOwnerGoals(sprint, draggedGoal.id, listOwner, beforeGoalId);
+
+  clearGoalDragState();
+
+  if (!didReorder) {
+    return;
+  }
+
+  touchSprint(sprint, `Reordered ${listOwner} goals`);
+  persistSnapshot();
+  render();
+}
+
+function handleGoalDragEnd() {
+  clearGoalDragState();
+}
+
+function clearGoalDragState() {
+  state.dragGoalId = null;
+  clearGoalDropIndicators();
+
+  document.querySelectorAll(".sp-goal-item.is-dragging").forEach((node) => {
+    node.classList.remove("is-dragging");
+  });
+}
+
+function clearGoalDropIndicators() {
+  document.querySelectorAll(".sp-goal-item.drop-before").forEach((node) => {
+    node.classList.remove("drop-before");
+  });
+
+  document.querySelectorAll(".sp-goal-list.drop-at-end").forEach((node) => {
+    node.classList.remove("drop-at-end");
+  });
+}
+
+function goalItemAfterPointer(goalList, pointerY) {
+  const candidates = Array.from(goalList.querySelectorAll(".sp-goal-item:not(.is-dragging)"));
+  let closest = {
+    offset: Number.NEGATIVE_INFINITY,
+    element: null
+  };
+
+  candidates.forEach((candidate) => {
+    const rect = candidate.getBoundingClientRect();
+    const offset = pointerY - rect.top - rect.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      closest = {
+        offset,
+        element: candidate
+      };
+    }
+  });
+
+  return closest.element;
+}
+
+function reorderOwnerGoals(sprint, goalId, owner, beforeGoalId) {
+  const ownerGoals = sprint.goals.filter((goal) => goal.owner === owner);
+  const originalOrder = ownerGoals.map((goal) => goal.id);
+  const fromIndex = ownerGoals.findIndex((goal) => goal.id === goalId);
+
+  if (fromIndex < 0) {
+    return false;
+  }
+
+  const [moved] = ownerGoals.splice(fromIndex, 1);
+
+  let insertIndex = ownerGoals.length;
+  if (beforeGoalId) {
+    const candidateIndex = ownerGoals.findIndex((goal) => goal.id === beforeGoalId);
+    insertIndex = candidateIndex >= 0 ? candidateIndex : ownerGoals.length;
+  }
+
+  ownerGoals.splice(insertIndex, 0, moved);
+
+  const nextOrder = ownerGoals.map((goal) => goal.id);
+  if (nextOrder.join("|") === originalOrder.join("|")) {
+    return false;
+  }
+
+  const orderedOwners = ownerColumns(sprint.goals);
+  const nextGoals = [];
+
+  orderedOwners.forEach((ownerName) => {
+    if (ownerName === owner) {
+      nextGoals.push(...ownerGoals);
+      return;
+    }
+
+    nextGoals.push(...sprint.goals.filter((goal) => goal.owner === ownerName));
+  });
+
+  sprint.goals = nextGoals;
+  return true;
+}
+
 function render() {
   renderMetrics();
   renderBoard();
@@ -826,11 +1013,10 @@ function renderDetail() {
   const goalColumns = owners
     .map((owner) => {
       const goals = sprint.goals
-        .filter((goal) => goal.owner === owner)
-        .sort((a, b) => compareIso(b.updatedAt, a.updatedAt));
+        .filter((goal) => goal.owner === owner);
 
       const listMarkup = goals.length
-        ? `<ul class="sp-list">${goals.map(renderGoalItem).join("")}</ul>`
+        ? `<ul class="sp-list sp-goal-list" data-owner="${escapeHtml(owner)}">${goals.map(renderGoalItem).join("")}</ul>`
         : '<p class="sp-empty-state">No goals yet.</p>';
 
       return `
@@ -956,7 +1142,7 @@ function renderGoalItem(goal) {
     : '<p class="sp-empty-state">No sub-tasks yet.</p>';
 
   return `
-    <li class="sp-list-item">
+    <li class="sp-list-item sp-goal-item" data-goal-id="${goal.id}" draggable="true">
       <div class="sp-goal-row">
         <label class="sp-goal-check">
           <input type="checkbox" data-action="goal-toggle" data-goal-id="${goal.id}" ${goal.done ? "checked" : ""} />
