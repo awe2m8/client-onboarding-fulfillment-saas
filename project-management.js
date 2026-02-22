@@ -50,6 +50,10 @@ const els = {
   projectForm: document.getElementById("projectForm"),
   seedProjectsBtn: document.getElementById("seedProjectsBtn"),
   clearProjectsBtn: document.getElementById("clearProjectsBtn"),
+  pmTopToggleBtn: document.getElementById("pmTopToggleBtn"),
+  pmTopContent: document.getElementById("pmTopContent"),
+  pmSyncToggleBtn: document.getElementById("pmSyncToggleBtn"),
+  pmSyncContent: document.getElementById("pmSyncContent"),
   apiUrlInput: document.getElementById("apiUrlInput"),
   workspaceKeyInput: document.getElementById("workspaceKeyInput"),
   saveSyncBtn: document.getElementById("saveSyncBtn"),
@@ -100,6 +104,16 @@ function bindEvents() {
   els.projectForm.addEventListener("submit", handleCreateProject);
   els.seedProjectsBtn.addEventListener("click", seedDemoProjects);
   els.clearProjectsBtn.addEventListener("click", clearAllProjects);
+  if (els.pmTopToggleBtn && els.pmTopContent) {
+    els.pmTopToggleBtn.addEventListener("click", () => {
+      togglePanelSection(els.pmTopToggleBtn, els.pmTopContent);
+    });
+  }
+  if (els.pmSyncToggleBtn && els.pmSyncContent) {
+    els.pmSyncToggleBtn.addEventListener("click", () => {
+      togglePanelSection(els.pmSyncToggleBtn, els.pmSyncContent);
+    });
+  }
 
   els.saveSyncBtn.addEventListener("click", saveSyncSettings);
   els.pullSharedBtn.addEventListener("click", () => {
@@ -136,6 +150,14 @@ function bindEvents() {
   els.projectDetail.addEventListener("submit", handleDetailSubmit);
   els.projectDetail.addEventListener("change", handleDetailChange);
   els.projectDetail.addEventListener("click", handleDetailClick);
+}
+
+function togglePanelSection(toggleBtn, contentEl) {
+  const isExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
+  const nextExpanded = !isExpanded;
+
+  toggleBtn.setAttribute("aria-expanded", String(nextExpanded));
+  contentEl.classList.toggle("is-collapsed", !nextExpanded);
 }
 
 function handleCreateProject(event) {
