@@ -8,7 +8,25 @@ const PORT = Number(process.env.PORT || 3001);
 const DATABASE_URL = process.env.DATABASE_URL;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "*";
 
-app.use(cors({ origin: CORS_ORIGIN === "*" ? true : CORS_ORIGIN.split(",") }));
+const corsPolicy = buildCorsPolicy(CORS_ORIGIN);
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (corsPolicy.allowAll || !origin) {
+        callback(null, true);
+        return;
+      }
+
+      const normalizedOrigin = normalizeOrigin(origin);
+      if (normalizedOrigin && corsPolicy.allowed.has(normalizedOrigin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("CORS origin not allowed"));
+    }
+  })
+);
 app.use(express.json({ limit: "8mb" }));
 
 const pool = DATABASE_URL
@@ -261,6 +279,46 @@ function parseIncomingTimestamp(value) {
     return new Date().toISOString();
   }
   return date.toISOString();
+}
+
+app.use((error, _req, res, next) => {
+  if (error && /cors/i.test(String(error.message || ""))) {
+    return res.status(403).json({
+      error: "CORS blocked this origin. Add your frontend URL to CORS_ORIGIN (comma-separated, no spaces needed)."
+    });
+  }
+
+  return next(error);
+});
+
+function buildCorsPolicy(rawValue) {
+  const entries = String(rawValue || "")
+    .split(",")
+    .map((item) => normalizeOrigin(item))
+    .filter(Boolean);
+
+  if (!entries.length || entries.includes("*")) {
+    return {
+      allowAll: true,
+      allowed: new Set()
+    };
+  }
+
+  return {
+    allowAll: false,
+    allowed: new Set(entries)
+  };
+}
+
+function normalizeOrigin(value) {
+  const cleaned = String(value || "").trim();
+  if (!cleaned) {
+    return "";
+  }
+  if (cleaned === "*") {
+    return "*";
+  }
+  return cleaned.replace(/\/+$/, "");
 }
 
 app.listen(PORT, () => {

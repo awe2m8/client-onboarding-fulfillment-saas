@@ -1781,9 +1781,18 @@ function isSyncReady() {
 }
 
 function normalizeApiUrl(value) {
-  return String(value || "")
+  const cleaned = String(value || "")
     .trim()
     .replace(/[?#]+$/g, "")
+    .replace(/\/+$/, "");
+
+  if (!cleaned) {
+    return "";
+  }
+
+  return cleaned
+    .replace(/\/health$/i, "")
+    .replace(/\/ops\/workspaces\/[^/]+\/(?:records|sync)$/i, "")
     .replace(/\/+$/, "");
 }
 
@@ -1886,6 +1895,9 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = SYNC_REQUEST_TIME
 function syncErrorMessage(error) {
   if (error && error.name === "AbortError") {
     return `Request timed out after ${Math.round(SYNC_REQUEST_TIMEOUT_MS / 1000)}s`;
+  }
+  if (error && error.name === "TypeError") {
+    return "Network/CORS error. Confirm API URL is the base Render URL and CORS_ORIGIN includes this Vercel app URL.";
   }
   return String(error?.message || error || "Unknown error");
 }

@@ -24,3 +24,8 @@ Re-run the schema when upgrading existing deployments so `ops_client_records.app
 
 ## Render setup
 Use the root `/render.yaml` Blueprint or create a Node Web Service from `api/`.
+
+Required env vars:
+- `DATABASE_URL` = Supabase Postgres connection string
+- `CORS_ORIGIN` = allowed frontend origins (comma-separated)
+  - Example: `https://client-onboarding-fulfillment-saas.vercel.app,https://client-onboarding-fulfillment-saas-git-main-awe2m8.vercel.app`
